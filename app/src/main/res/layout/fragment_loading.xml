@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="60dp">
+
+    <TextView
+            android:id="@+id/fragment_loading_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="@string/loading_database"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textAlignment="center"
+
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="50dp"/>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="50dp"
+
+            android:layout_above="@id/fragment_loading_text"
+            android:padding="40dp">
+        <com.github.ybq.android.spinkit.SpinKitView
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+
+                style="@style/SpinKitView.Large.CubeGrid"
+                app:SpinKit_Color="@color/colorPrimary"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:text="@string/fragment_loading_text"
+                android:textColor="@android:color/white"
+                android:textSize="90sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:textAlignment="center"
+
+                android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+</RelativeLayout>

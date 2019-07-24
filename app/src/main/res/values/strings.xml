@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">TCL Watcher</string>
+
+    <string name="loading_online">Téléchargement des stations…</string>
+    <string name="inserting_database">Sauvegarde locale des stations…</string>
+    <string name="loading_database">Chargement des stations…</string>
+    <string name="view_stationpicker_swap">Inverser</string>
+    <string name="view_stationpicker_spinner_sep">à</string>
+    <string name="fragment_loading_text">TCL</string>
+
+    <string-array name="spinner_dep_arr">
+        <item>Partir</item>
+        <item>Arriver</item>
+    </string-array>
+
+    <string-array name="spinner_date">
+        <item>aujourd\'hui</item>
+        <item>demain</item>
+        <item>autre…</item>
+    </string-array>
+</resources>

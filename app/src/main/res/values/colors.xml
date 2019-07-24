@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#C02424</color>
+    <color name="colorPrimaryDark">#C02424</color>
+    <color name="colorAccent">#009DB7</color>
+    <color name="timeColor">#009DB7</color>
+
+    <color name="stationPickerColor">#EBEBEB</color>
+    <color name="stationPickerBorderColor">#A9BEBEBE</color>
+</resources>
