@@ -18,6 +18,7 @@ class SubRouteAdapter internal constructor(route:Route) :
     private val subroutes = route.get()
 
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        var container: View = v.findViewById(R.id.row_subroute_container)
         var departAt: TextView = v.findViewById(R.id.row_subroute_departat)
         var arriveAt: TextView = v.findViewById(R.id.row_subroute_arriveat)
         var duration: TextView = v.findViewById(R.id.row_subroute_duration)
@@ -69,5 +70,6 @@ class SubRouteAdapter internal constructor(route:Route) :
     override fun getItemCount(): Int {
         return subroutes.size
     }
+
 
 }

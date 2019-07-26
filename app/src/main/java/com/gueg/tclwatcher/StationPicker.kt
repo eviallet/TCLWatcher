@@ -30,6 +30,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private var timeLayout: LinearLayout
     private var timeText: TextView
     var listener: StationPickerListener ?= null
+    private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
 
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
@@ -57,11 +58,13 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
             override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
                 if(position==2) {
                     val pickerDialog = DatePickerDialog(
-                        context, DatePickerDialog.OnDateSetListener { _, _, month, day ->
+                        context, DatePickerDialog.OnDateSetListener { _, y, month, day ->
+                            year = y
+                            val m = month+1
                             dateText.text = ("le ${
                                 if(day<10) "0$day" else day
                             }/${
-                                if(month<10) "0$month" else month
+                                if(m<10) "0$m" else m
                             }")
                         },
                         Calendar.getInstance().get(Calendar.YEAR),
@@ -94,7 +97,19 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         }
 
         fab = findViewById(R.id.view_stationpicker_fab)
-        fab.setOnClickListener { listener!!.onSearchClicked(from.text.toString(), to.text.toString()) }
+        fab.setOnClickListener {
+            val request = Request(
+                from=from.text.toString(),
+                to=to.text.toString(),
+                timeMode= if(depArr.selectedItemPosition==0) Request.TimeMode.DEPART_AT else Request.TimeMode.ARRIVE_AT,
+                year= year,
+                month= getMonth(),
+                day= getDay(),
+                hour= timeText.text.split(":")[0].toInt(),
+                minute= timeText.text.split(":")[1].toInt()
+            )
+            listener!!.onRequestEmitted(request)
+        }
 
         swap = findViewById(R.id.view_stationpicker_swap)
         swap.setOnClickListener {
@@ -126,10 +141,41 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         }
     }
 
+    fun initFrom(picker: StationPicker) {
+        from.text = picker.from.text
+        to.text = picker.to.text
+        depArr.setSelection(picker.depArr.selectedItemPosition)
+        dateText.text = picker.dateText.text
+        timeText.text = picker.timeText.text
+        listener = picker.listener
+        year = picker.year
+    }
+
     private fun now(): String {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val min = Calendar.getInstance().get(Calendar.MINUTE)
         return ("${if(hour<10) "0$hour" else hour}:${if(min<10) "0$min" else min}")
+    }
+
+    private fun getMonth(): Int = when {
+        dateText.text == "aujourd'hui" -> Calendar.getInstance().get(Calendar.MONTH) + 1
+        dateText.text == "demain" -> {
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            calendar.get(Calendar.MONTH) + 1
+        }
+        else -> dateText.text.split("/")[1].toInt()
+    }
+
+    private fun getDay(): Int = when {
+        dateText.text == "aujourd'hui" -> Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        dateText.text == "demain" -> {
+            val calendar = Calendar.getInstance().clone() as Calendar
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            year = calendar.get(Calendar.YEAR)
+            calendar.get(Calendar.DAY_OF_MONTH)
+        }
+        else -> dateText.text.split("/")[0].replace("le ","").toInt()
     }
 
     fun setStations(stations: List<Station>) {
@@ -148,6 +194,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     }
 
     interface StationPickerListener {
-        fun onSearchClicked(from: String, to: String)
+        fun onRequestEmitted(request: Request)
     }
 }

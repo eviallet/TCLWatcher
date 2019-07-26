@@ -3,19 +3,20 @@ package com.gueg.tclwatcher
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.transition.AutoTransition
+import android.transition.Explode
 import android.view.View
 import android.widget.FrameLayout
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.INSERT_DB
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.LOAD_ONLINE
 
 
-
-
-class MainActivity : AppCompatActivity(), HomepageFragment.HomepageListener {
+class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private lateinit var container: FrameLayout
     private var loadingFragment = LoadingFragment()
     private var homepageFramgent = HomepageFragment()
+    private var currentFragment: Fragment ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +24,9 @@ class MainActivity : AppCompatActivity(), HomepageFragment.HomepageListener {
         container.id = View.generateViewId()
         setContentView(container)
 
-        homepageFramgent.setHomepageListener(this)
+        homepageFramgent.setStationPickerListener(this)
 
-        supportFragmentManager.beginTransaction().add(container.id, loadingFragment).commit()
+        setFragment(loadingFragment)
 
         loadStations()
     }
@@ -46,9 +47,8 @@ class MainActivity : AppCompatActivity(), HomepageFragment.HomepageListener {
         }).start()
     }
 
-    override fun onRequestEmitted(from: String, to: String) {
-        val request = Request(from, to)
-        RouteParser.parseRoute(request, object: RouteParser.RouteParserListener {
+    override fun onRequestEmitted(request: Request) {
+        RouteParser.parseRoute(request, object : RouteParser.RouteParserListener {
             override fun onRouteParsed(route: Route) {
                 runOnUiThread {
                     val routesFragment = RoutesFragment()
@@ -56,11 +56,41 @@ class MainActivity : AppCompatActivity(), HomepageFragment.HomepageListener {
                     setFragment(routesFragment)
                 }
             }
+        }, uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { _, throwable ->
+            runOnUiThread {
+                if(throwable is RouteParser.ParseError)
+                    homepageFramgent.setError(throwable.message.toString().split(".")[0].plus("."))
+                else
+                    homepageFramgent.setError("Erreur inconnue")
+            }
         })
     }
 
     private fun setFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().replace(container.id, fragment).commit()
+        if((currentFragment is RoutesFragment || currentFragment is HomepageFragment) && (fragment is RoutesFragment || fragment is HomepageFragment)) {
+            fragment.enterTransition = Explode(this, null)
+            fragment.sharedElementEnterTransition = AutoTransition()
+            currentFragment!!.exitTransition = Explode(this, null)
+
+            if(fragment is HomepageFragment)
+                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag<StationPicker>("transition_picker")
+            else if(fragment is RoutesFragment)
+                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag<StationPicker>("transition_picker")
+
+            supportFragmentManager.beginTransaction()
+                .addSharedElement(currentFragment!!.view!!.findViewWithTag("transition_picker"), "transition_picker")
+                .replace(container.id, fragment).commit()
+        } else
+            supportFragmentManager.beginTransaction().replace(container.id, fragment).commit()
+
+        currentFragment = fragment
+    }
+
+    override fun onBackPressed() {
+        if(currentFragment is RoutesFragment)
+            setFragment(homepageFramgent)
+        else
+            super.onBackPressed()
     }
 
 

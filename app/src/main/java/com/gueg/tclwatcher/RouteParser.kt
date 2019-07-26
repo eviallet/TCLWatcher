@@ -4,6 +4,7 @@ import android.util.Log
 import com.gueg.tclwatcher.Route.TCL
 import com.gueg.tclwatcher.Route.Walk
 import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 
 
 class RouteParser {
@@ -11,7 +12,9 @@ class RouteParser {
     companion object {
         private const val TAG = "RouteParser"
 
-        fun parseRoute(request: Request, routeParserListener: RouteParserListener, url: String="") {
+        @Throws(ParseError::class)
+        fun parseRoute(request: Request, routeParserListener: RouteParserListener, url: String="",
+                       uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()) {
             Thread {
                 var finalUrl = if(url.isEmpty()) request.toString() else url
 
@@ -36,7 +39,13 @@ class RouteParser {
                     prev = prev, next = next
                 )
 
-                val rows = page.getElementsByClass("RESULTAT-TRAJET")[0].getElementsByClass("row")
+                val rows: Elements
+                try {
+                    rows = page.getElementsByClass("RESULTAT-TRAJET")[0].getElementsByClass("row")
+                } catch(e: IndexOutOfBoundsException) {
+                    val error = page.getElementsByClass("ERROR")[0].text()
+                    throw ParseError(error)
+                }
 
                 for (row in rows) {
                     // walk
@@ -73,10 +82,15 @@ class RouteParser {
 
                 routeParserListener.onRouteParsed(route)
 
-            }.start()
+            }.apply {
+                this.uncaughtExceptionHandler = uncaughtExceptionHandler
+                start()
+            }
         }
     }
 
+
+    class ParseError(message: String) : RuntimeException(message)
 
     interface RouteParserListener {
         fun onRouteParsed(route: Route)

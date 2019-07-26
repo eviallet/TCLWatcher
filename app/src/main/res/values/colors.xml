@@ -7,4 +7,9 @@
 
     <color name="stationPickerColor">#EBEBEB</color>
     <color name="stationPickerBorderColor">#A9BEBEBE</color>
+
+    <color name="homepageButtonsColor">#A95A5A5A</color>
+
+    <color name="errorBkg">#FD9726</color>
+    <color name="errorText">#3D2409</color>
 </resources>

@@ -26,6 +26,14 @@ class RoutesFragment: Fragment() {
     lateinit var leftLoadingView: LoadingView
     lateinit var rightLoadingView: LoadingView
 
+    lateinit var stationPicker: StationPicker
+    var tempStationPickerData: StationPicker ?= null
+        set(value) {
+            if(::stationPicker.isInitialized)
+                stationPicker.initFrom(value!!)
+            field = value
+        }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView = inflater.inflate(R.layout.fragment_routes, container, false)
 
@@ -36,36 +44,51 @@ class RoutesFragment: Fragment() {
         pagerAdapter = RoutesPagerAdapter(activity!!, activity!!.supportFragmentManager, route)
         viewPager.adapter = pagerAdapter
 
+        stationPicker = rootView.findViewById(R.id.fragment_routes_stationpicker)
+        if(tempStationPickerData != null)
+            stationPicker.initFrom(tempStationPickerData!!)
+
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) = when (position) {
                 0 -> {
                     pagerAdapter.loadPrevOrNext(PREV)
-                    leftLoadingView.setLoading()
+                    leftLoadingView.loading = true
                 }
                 pagerAdapter.count-1 -> {
                     pagerAdapter.loadPrevOrNext(NEXT)
-                    rightLoadingView.setLoading()
+                    rightLoadingView.loading = true
                 }
-                else -> pagerAdapter.updateLoadingViews()
+                else -> {
+                    leftLoadingView.loading = false
+                    rightLoadingView.loading = false
+                }
             }
         })
 
         return rootView
     }
 
-    inner class RoutesPagerAdapter(val activity: Activity, fm: FragmentManager, route: Route) : FragmentStatePagerAdapter(fm) {
+    inner class RoutesPagerAdapter(private val activity: Activity, fm: FragmentManager, route: Route) : FragmentStatePagerAdapter(fm) {
 
         private val frags = ArrayList<Route>()
         private val handler = Handler()
 
         private fun add(pos: Int = -1, route: Route) {
-            if(pos==-1)
-                frags.add(route)
-            else
-                frags.add(pos, route)
-            handler.post { activity.runOnUiThread { notifyDataSetChanged() } }
+            handler.post {
+                if(pos==-1)
+                    frags.add(route)
+                else
+                    frags.add(pos, route)
+                activity.runOnUiThread {
+                    notifyDataSetChanged()
+                    if(pos==-1)
+                        rightLoadingView.loading = false
+                    else
+                        leftLoadingView.loading = false
+                }
+            }
         }
 
         init {
@@ -85,22 +108,8 @@ class RoutesFragment: Fragment() {
                         add(pos=viewPager.currentItem, route=route)
                     else
                         add(pos=viewPager.currentItem + 1, route=route)
-
-                    activity.runOnUiThread {
-                        if(prev)
-                            viewPager.currentItem = viewPager.currentItem + 1
-                        updateLoadingViews()
-                    }
                 }
             }, url= if(prev) route.prev else route.next)
-        }
-
-        fun updateLoadingViews() {
-            val pos = viewPager.currentItem
-            if(pos-1>=0)
-                leftLoadingView.setTimes(frags[pos+PREV].departureTime, frags[pos+PREV].arrivalTime)
-            if(pos+1<frags.size)
-                rightLoadingView.setTimes(frags[pos+NEXT].departureTime, frags[pos+NEXT].arrivalTime)
         }
 
         override fun getCount() = frags.size

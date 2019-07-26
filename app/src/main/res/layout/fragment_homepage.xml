@@ -1,17 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-
-              android:padding="4dp">
-    <com.gueg.tclwatcher.StationPicker
-            android:id="@+id/fragment_homepage_stationpicker"
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
 
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"/>
-</LinearLayout>
+            android:padding="4dp">
+        <include layout="@layout/menu_homepage" />
+        <com.gueg.tclwatcher.StationPicker
+                android:id="@+id/fragment_homepage_stationpicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:tag="transition_picker"
+                android:transitionName="transition_picker"/>
+
+    </LinearLayout>
+    <LinearLayout
+            android:id="@+id/fragment_homepage_error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+
+            android:background="@color/errorBkg"
+
+            android:padding="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="-50dp">
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+
+                android:src="@drawable/ic_error"
+
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"/>
+        <TextView
+                android:id="@+id/fragment_homepage_error_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+
+                android:layout_gravity="center_vertical"/>
+
+
+    </LinearLayout>
+</RelativeLayout>
