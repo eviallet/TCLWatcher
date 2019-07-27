@@ -7,6 +7,9 @@
     <string name="view_stationpicker_swap">Inverser</string>
     <string name="view_stationpicker_spinner_sep">à</string>
     <string name="fragment_loading_text">TCL</string>
+    <string name="cancel">Annuler</string>
+    <string name="ok">Valider</string>
+    <string name="dialog_stationconflict_title">Choisir une station</string>
 
     <string-array name="spinner_dep_arr">
         <item>Partir</item>

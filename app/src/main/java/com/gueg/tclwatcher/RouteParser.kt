@@ -41,10 +41,44 @@ class RouteParser {
 
                 val rows: Elements
                 try {
+                    // if everything went as planned
                     rows = page.getElementsByClass("RESULTAT-TRAJET")[0].getElementsByClass("row")
                 } catch(e: IndexOutOfBoundsException) {
-                    val error = page.getElementsByClass("ERROR")[0].text()
-                    throw ParseError(error)
+                    try {
+                        // if the station name was ambiguous, giving multiple results in a table
+                        val tableFrom = page.getElementsByClass("TABLE-form-precise")[0]
+                        val tableFromRows = tableFrom.select("tr")
+                        val choicesFrom = ArrayList<String>()
+                        val valuesFrom = ArrayList<String>()
+
+                        for(tableRow in tableFromRows) {
+                            if (tableRow.select("input[name=arretDepart]").first().attr("value").toString() != "#") { // "Modifier ma demande"
+                                val id = tableRow.select("input[name=arretDepart]").first().attr("id")
+                                choicesFrom.add(tableRow.select("label[for=$id]").first().text())
+                                valuesFrom.add(tableRow.select("input[name=arretDepart]").first().attr("value").toString())
+                            }
+                        }
+
+                        val tableTo = page.getElementsByClass("TABLE-form-precise")[1]
+                        val tableToRows = tableTo.select("tr")
+                        val choicesTo = ArrayList<String>()
+                        val valuesTo = ArrayList<String>()
+
+                        for(tableRow in tableToRows) {
+                            if(tableRow.select("input[name=arretArrivee]").first().attr("value").toString()!="#") { // "Modifier ma demande"
+                                val id = tableRow.select("input[name=arretArrivee]").first().attr("id")
+                                choicesTo.add(tableRow.select("label[for=$id]").first().text())
+                                valuesTo.add(tableRow.select("input[name=arretArrivee]").first().attr("value").toString())
+                            }
+                        }
+
+                        throw StationConflictError(choicesFrom, valuesFrom, choicesTo, valuesTo)
+
+                    } catch(e: IndexOutOfBoundsException) {
+                        // if there was any other error (out of date range, same station selected...)
+                        val error = page.getElementsByClass("ERROR")[0].text()
+                        throw ParseError(error)
+                    }
                 }
 
                 for (row in rows) {
@@ -91,6 +125,7 @@ class RouteParser {
 
 
     class ParseError(message: String) : RuntimeException(message)
+    class StationConflictError(val choicesFrom: ArrayList<String>, val valuesFrom: ArrayList<String>, val choicesTo: ArrayList<String>, val valuesTo: ArrayList<String>) : RuntimeException()
 
     interface RouteParserListener {
         fun onRouteParsed(route: Route)

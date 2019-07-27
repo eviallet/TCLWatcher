@@ -31,6 +31,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private var timeText: TextView
     var listener: StationPickerListener ?= null
     private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
+    private lateinit var autoCompleteAdapter: ArrayAdapter<String>
 
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
@@ -149,6 +150,9 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         timeText.text = picker.timeText.text
         listener = picker.listener
         year = picker.year
+        autoCompleteAdapter = picker.autoCompleteAdapter
+        from.setAdapter(autoCompleteAdapter)
+        to.setAdapter(autoCompleteAdapter)
     }
 
     private fun now(): String {
@@ -188,6 +192,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
             android.R.layout.simple_dropdown_item_1line,
             stationsStrings
         )
+
+        autoCompleteAdapter = adapter
 
         from.setAdapter(adapter)
         to.setAdapter(adapter)

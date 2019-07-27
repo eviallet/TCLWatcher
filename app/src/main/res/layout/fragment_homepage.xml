@@ -19,36 +19,12 @@
                 android:transitionName="transition_picker"/>
 
     </LinearLayout>
-    <LinearLayout
-            android:id="@+id/fragment_homepage_error_layout"
+    <include
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
 
-            android:background="@color/errorBkg"
+            layout="@layout/view_error"
 
-            android:padding="10dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="-50dp">
-        <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-
-                android:src="@drawable/ic_error"
-
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="20dp"/>
-        <TextView
-                android:id="@+id/fragment_homepage_error_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-
-                android:layout_gravity="center_vertical"/>
-
-
-    </LinearLayout>
+            android:layout_marginBottom="-50dp"
+            android:layout_alignParentBottom="true"/>
 </RelativeLayout>
