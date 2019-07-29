@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <com.gueg.tclwatcher.StationPicker
             android:id="@+id/fragment_routes_stationpicker"
@@ -18,6 +18,15 @@
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"/>
 
+    <android.support.v4.view.ViewPager
+            android:id="@+id/fragment_routes_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_marginTop="5dp"
+            android:padding="5dp"
+            android:layout_below="@id/fragment_routes_stationpicker"/>
+
     <com.gueg.tclwatcher.LoadingView
             android:id="@+id/fragment_routes_leftloading"
             android:layout_width="30dp"
@@ -25,7 +34,8 @@
 
             android:rotation="90"
 
-            android:layout_centerVertical="true"/>
+            android:layout_below="@id/fragment_routes_stationpicker"
+            android:layout_marginTop="150dp"/>
     <com.gueg.tclwatcher.LoadingView
             android:id="@+id/fragment_routes_rightloading"
             android:layout_width="30dp"
@@ -33,21 +43,7 @@
 
             android:rotation="270"
 
+            android:layout_alignTop="@id/fragment_routes_viewpager"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
-    <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:cardElevation="5dp"
-
-            android:layout_margin="5dp"
-            android:layout_below="@id/fragment_routes_stationpicker"
-            android:layout_toEndOf="@id/fragment_routes_leftloading"
-            android:layout_toStartOf="@id/fragment_routes_rightloading">
-        <android.support.v4.view.ViewPager
-                android:id="@+id/fragment_routes_viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-    </android.support.v7.widget.CardView>
-
+            android:layout_marginTop="150dp"/>
 </RelativeLayout>

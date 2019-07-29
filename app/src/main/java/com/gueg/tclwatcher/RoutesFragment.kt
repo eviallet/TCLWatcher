@@ -1,5 +1,6 @@
 package com.gueg.tclwatcher
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
@@ -51,45 +52,33 @@ class RoutesFragment: Fragment() {
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageSelected(position: Int) = when (position) {
-                0 -> {
-                    pagerAdapter.loadPrevOrNext(PREV)
-                    leftLoadingView.loading = true
-                }
-                pagerAdapter.count-1 -> {
-                    pagerAdapter.loadPrevOrNext(NEXT)
-                    rightLoadingView.loading = true
-                }
-                else -> {
-                    leftLoadingView.loading = false
-                    rightLoadingView.loading = false
+            override fun onPageSelected(position: Int) {
+                when (position) {
+                    0 -> {
+                        pagerAdapter.loadPrevOrNext(PREV)
+                        leftLoadingView.loading = true
+                    }
+                    pagerAdapter.count - 1 -> {
+                        pagerAdapter.loadPrevOrNext(NEXT)
+                        rightLoadingView.loading = true
+                    }
+                    else -> {
+                        leftLoadingView.loading = false
+                        rightLoadingView.loading = false
+                    }
                 }
             }
         })
+
 
         return rootView
     }
 
     inner class RoutesPagerAdapter(private val activity: Activity, fm: FragmentManager, route: Route) : FragmentStatePagerAdapter(fm) {
 
-        private val frags = ArrayList<Route>()
+        @SuppressLint("UseSparseArrays")
+        private val frags = ArrayList<RouteFragment>()
         private val handler = Handler()
-
-        private fun add(pos: Int = -1, route: Route) {
-            handler.post {
-                if(pos==-1)
-                    frags.add(route)
-                else
-                    frags.add(pos, route)
-                activity.runOnUiThread {
-                    notifyDataSetChanged()
-                    if(pos==-1)
-                        rightLoadingView.loading = false
-                    else
-                        leftLoadingView.loading = false
-                }
-            }
-        }
 
         init {
             add(route=route)
@@ -98,26 +87,38 @@ class RoutesFragment: Fragment() {
             loadPrevOrNext(NEXT, route)
         }
 
-        fun loadPrevOrNext(prevOrNext: Int, route: Route = frags[viewPager.currentItem]) {
-            val prev = prevOrNext == PREV
-            val next = prevOrNext == NEXT
-            if(!prev && !next) return
+        private fun add(pos: Int = -1, route: Route) {
+            handler.post {
+                val frag = RouteFragment.from(route)
+                val viewPagerPos = viewPager.currentItem
+                when(pos) {
+                    PREV -> frags.add(viewPagerPos, frag)
+                    else -> frags.add(viewPagerPos + 1, frag)
+                }
+                activity.runOnUiThread {
+                    if(pos == PREV) {
+                        viewPager.adapter = this
+                        viewPager.currentItem = viewPagerPos + 1
+                    } else
+                        notifyDataSetChanged()
+                    when(pos) {
+                        PREV -> leftLoadingView.loading = false
+                        else -> rightLoadingView.loading= false
+                    }
+                }
+            }
+        }
+
+        fun loadPrevOrNext(prevOrNext: Int, route: Route = frags[viewPager.currentItem].route) {
             RouteParser.parseRoute(Request(route.from, route.to), object: RouteParser.RouteParserListener {
                 override fun onRouteParsed(route: Route) {
-                    if(prev)
-                        add(pos=viewPager.currentItem, route=route)
-                    else
-                        add(pos=viewPager.currentItem + 1, route=route)
+                    add(prevOrNext, route=route)
                 }
-            }, url= if(prev) route.prev else route.next)
+            }, url= if(prevOrNext == PREV) route.prev else route.next)
         }
 
         override fun getCount() = frags.size
-        override fun getItem(p0: Int): Fragment {
-            val routeFragment = RouteFragment()
-            routeFragment.route = frags[p0]
-            return routeFragment
-        }
+        override fun getItem(p0: Int) = frags[p0]
     }
 
 }
