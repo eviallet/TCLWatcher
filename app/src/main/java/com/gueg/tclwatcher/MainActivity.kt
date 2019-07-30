@@ -1,13 +1,16 @@
 package com.gueg.tclwatcher
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.transition.AutoTransition
 import android.transition.Explode
 import android.util.Log
-import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.INSERT_DB
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.LOAD_ONLINE
 import org.jsoup.HttpStatusException
@@ -17,15 +20,23 @@ import java.net.SocketTimeoutException
 class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private lateinit var container: FrameLayout
+
+    private lateinit var errorLayout: LinearLayout
+    private lateinit var errorText: TextView
+    private var errorShown: Boolean = false
+
+
     private var loadingFragment = LoadingFragment()
     private var homepageFramgent = HomepageFragment()
     private var currentFragment: Fragment ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        container = FrameLayout(this)
-        container.id = View.generateViewId()
-        setContentView(container)
+        setContentView(R.layout.activity_main)
+
+        container = findViewById(R.id.activity_main_container)
+        errorLayout = findViewById(R.id.activity_main_error_layout)
+        errorText = findViewById(R.id.activity_main_error_text)
 
         homepageFramgent.setStationPickerListener(this)
 
@@ -56,6 +67,39 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 runOnUiThread {
                     val routesFragment = RoutesFragment()
                     routesFragment.route = route
+                    routesFragment.routeFragmentListener = object: RouteFragment.RouteFragmentListener {
+                        override fun onStationMap(name: String) {
+                            val intent = Intent(applicationContext, MapActivity::class.java)
+                            intent.putExtra(MapActivity.EXTRA_STATION, name)
+                            startActivity(intent)
+                        }
+                        override fun onRouteMap(route: Route) {
+                            Thread {
+                                val intent = Intent(applicationContext, MapActivity::class.java)
+                                val doubleArrayList = ArrayList<Double>()
+                                for (i in 0 until route.get().size - 1) {
+                                    val subroute = route.get()[i]
+                                    if (subroute is Route.TCL) {
+                                        val from = StationDatabase.getDatabase(applicationContext).stationDao()
+                                            .findByName(subroute.from)
+                                        val to = StationDatabase.getDatabase(applicationContext).stationDao()
+                                            .findByName(subroute.to)
+                                        doubleArrayList.add(from.lat)
+                                        doubleArrayList.add(from.lon)
+                                        doubleArrayList.add(to.lat)
+                                        doubleArrayList.add(to.lon)
+                                    }
+                                }
+                                startActivity(intent
+                                    .putExtra(MapActivity.EXTRA_PATH, doubleArrayList.toDoubleArray())
+                                )
+                            }.start()
+                        }
+                        override fun onBookmark(route: Route) {
+                        }
+                        override fun onShare(route: Route) {
+                        }
+                    }
                     setFragment(routesFragment)
                 }
             }
@@ -63,7 +107,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             runOnUiThread {
                 Log.d(":-:",throwable.javaClass.name)
                 when (throwable) {
-                    is RouteParser.ParseError -> homepageFramgent.setError(throwable.message.toString().split(".")[0].plus("."))
+                    is RouteParser.ParseError -> setError(throwable.message.toString().split(".")[0].plus("."))
                     is RouteParser.StationConflictError -> { // if there was any conflict
                         // if "from" field had a conflict
                         if(throwable.choicesFrom.size > 1) {
@@ -90,9 +134,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                             }
                         }
                     }
-                    is SocketTimeoutException -> homepageFramgent.setError("Le serveur ne répond pas.")
-                    is HttpStatusException -> homepageFramgent.setError("Le serveur est hors ligne.")
-                    else -> homepageFramgent.setError("Une erreur inconnue est survenue.")
+                    is SocketTimeoutException -> setError("Le serveur ne répond pas.")
+                    is HttpStatusException -> setError("Le serveur est hors ligne.")
+                    else -> setError("Une erreur inconnue est survenue.")
                 }
             }
         })
@@ -102,7 +146,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         StationConflictDialog(
             this, object : StationConflictDialog.StationConflictListener {
                 override fun onCancelled() {
-                    homepageFramgent.setError("Impossible de poursuivre.")
+                    setError("Impossible de poursuivre.")
                 }
                 override fun onValidated(value: String) {
                     if(from)
@@ -142,5 +186,16 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             super.onBackPressed()
     }
 
+
+    fun setError(text: String) {
+        errorText.text = text
+        if(!errorShown) {
+            errorShown = true
+            errorLayout.animate().translationYBy(-errorLayout.height.toFloat()+2)
+            Handler().postDelayed({
+                errorLayout.animate().translationY(0f).withEndAction { errorShown = false }
+            }, 3000)
+        }
+    }
 
 }

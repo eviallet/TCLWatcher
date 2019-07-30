@@ -1,13 +1,12 @@
 package com.gueg.tclwatcher
 
+import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.ImageButton
 
 
 
@@ -15,10 +14,6 @@ class HomepageFragment : Fragment() {
 
     private lateinit var rootView: ViewGroup
     private lateinit var stationPicker: StationPicker
-
-    private lateinit var errorLayout: LinearLayout
-    private lateinit var errorText: TextView
-    private var errorShown: Boolean = false
 
     private lateinit var stationPickerListener: StationPicker.StationPickerListener
     private lateinit var stations: List<Station>
@@ -39,8 +34,9 @@ class HomepageFragment : Fragment() {
         if(tempStationPickerData != null)
             stationPicker.initFrom(tempStationPickerData!!)
 
-        errorLayout = rootView.findViewById(R.id.fragment_homepage_error_layout)
-        errorText = rootView.findViewById(R.id.fragment_homepage_error_text)
+        rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_map).setOnClickListener {
+            activity!!.startActivity(Intent(activity, MapActivity::class.java))
+        }
 
         return rootView
     }
@@ -53,15 +49,5 @@ class HomepageFragment : Fragment() {
         this.stationPickerListener = stationPickerListener
     }
 
-    fun setError(text: String) {
-        errorText.text = text
-        if(!errorShown) {
-            errorShown = true
-            errorLayout.animate().translationYBy(-errorLayout.height.toFloat()+1)
-            Handler().postDelayed({
-                errorLayout.animate().translationY(0f).withEndAction { errorShown = false }
-            }, 3000)
-        }
-    }
 
 }

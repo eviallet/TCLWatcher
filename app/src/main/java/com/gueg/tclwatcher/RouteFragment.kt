@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 
 
@@ -27,13 +28,15 @@ class RouteFragment : Fragment() {
     private lateinit var departAt: TextView
     private lateinit var arriveAt: TextView
     private lateinit var duration: TextView
+    private lateinit var date: TextView
 
     private lateinit var adapter: SubRouteAdapter
     lateinit var route:Route
 
+    lateinit var routeFragmentListener: RouteFragmentListener
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView = inflater.inflate(R.layout.fragment_route, container, false)
-
 
         recyclerView = rootView.findViewById(R.id.fragment_route_recyclerview)
         departAt = rootView.findViewById(R.id.fragment_route_departat)
@@ -42,10 +45,15 @@ class RouteFragment : Fragment() {
         arriveAt.text = route.arrivalTime
         duration = rootView.findViewById(R.id.fragment_route_duration)
         duration.text = route.totalDuration
+        date = rootView.findViewById(R.id.fragment_route_date)
+
+        rootView.findViewById<ImageButton>(R.id.fragment_route_share).setOnClickListener { routeFragmentListener.onShare(route) }
+        rootView.findViewById<ImageButton>(R.id.fragment_route_map).setOnClickListener { routeFragmentListener.onRouteMap(route) }
+        rootView.findViewById<ImageButton>(R.id.fragment_route_bookmark).setOnClickListener { routeFragmentListener.onBookmark(route) }
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = SubRouteAdapter(route)
+        adapter = SubRouteAdapter(route, routeFragmentListener)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(VerticalItemDecoration(30))
 
@@ -54,5 +62,16 @@ class RouteFragment : Fragment() {
         return rootView
     }
 
+    fun with(routeFragmentListener: RouteFragmentListener): RouteFragment {
+        this.routeFragmentListener = routeFragmentListener
+        return this
+    }
+
+    interface RouteFragmentListener {
+        fun onStationMap(name: String)
+        fun onRouteMap(route: Route)
+        fun onBookmark(route: Route)
+        fun onShare(route: Route)
+    }
 
 }

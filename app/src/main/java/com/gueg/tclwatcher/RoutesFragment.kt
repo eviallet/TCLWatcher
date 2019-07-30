@@ -1,6 +1,5 @@
 package com.gueg.tclwatcher
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
@@ -26,6 +25,7 @@ class RoutesFragment: Fragment() {
     lateinit var route: Route
     lateinit var leftLoadingView: LoadingView
     lateinit var rightLoadingView: LoadingView
+    lateinit var routeFragmentListener: RouteFragment.RouteFragmentListener
 
     lateinit var stationPicker: StationPicker
     var tempStationPickerData: StationPicker ?= null
@@ -76,8 +76,8 @@ class RoutesFragment: Fragment() {
 
     inner class RoutesPagerAdapter(private val activity: Activity, fm: FragmentManager, route: Route) : FragmentStatePagerAdapter(fm) {
 
-        @SuppressLint("UseSparseArrays")
         private val frags = ArrayList<RouteFragment>()
+        private val routes = ArrayList<Route>()
         private val handler = Handler()
 
         init {
@@ -89,21 +89,24 @@ class RoutesFragment: Fragment() {
 
         private fun add(pos: Int = -1, route: Route) {
             handler.post {
-                val frag = RouteFragment.from(route)
-                val viewPagerPos = viewPager.currentItem
-                when(pos) {
-                    PREV -> frags.add(viewPagerPos, frag)
-                    else -> frags.add(viewPagerPos + 1, frag)
-                }
-                activity.runOnUiThread {
-                    if(pos == PREV) {
-                        viewPager.adapter = this
-                        viewPager.currentItem = viewPagerPos + 1
-                    } else
-                        notifyDataSetChanged()
-                    when(pos) {
-                        PREV -> leftLoadingView.loading = false
-                        else -> rightLoadingView.loading= false
+                if (!routes.contains(route)) {
+                    routes.add(route)
+                    val frag = RouteFragment.from(route).with(routeFragmentListener)
+                    val viewPagerPos = viewPager.currentItem
+                    when (pos) {
+                        PREV -> frags.add(viewPagerPos, frag)
+                        else -> frags.add(viewPagerPos + 1, frag)
+                    }
+                    activity.runOnUiThread {
+                        if (pos == PREV) {
+                            viewPager.adapter = this
+                            viewPager.currentItem = viewPagerPos + 1
+                        } else
+                            notifyDataSetChanged()
+                        when (pos) {
+                            PREV -> leftLoadingView.loading = false
+                            else -> rightLoadingView.loading = false
+                        }
                     }
                 }
             }

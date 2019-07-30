@@ -19,12 +19,4 @@
                 android:transitionName="transition_picker"/>
 
     </LinearLayout>
-    <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            layout="@layout/view_error"
-
-            android:layout_marginBottom="-50dp"
-            android:layout_alignParentBottom="true"/>
 </RelativeLayout>

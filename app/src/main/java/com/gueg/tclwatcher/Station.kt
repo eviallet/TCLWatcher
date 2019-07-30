@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "station_database")
-class Station(@PrimaryKey val name: String, val coordinatesX: Double, val coordinatesY: Double) {
+class Station(@PrimaryKey val name: String, val lon: Double, val lat: Double) {
     override fun toString(): String {
-        return "$name = $coordinatesX : $coordinatesY"
+        return "$name = $lon : $lat"
     }
 
     override fun equals(other: Any?): Boolean {

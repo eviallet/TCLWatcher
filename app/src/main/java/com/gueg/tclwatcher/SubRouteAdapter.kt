@@ -12,7 +12,7 @@ import android.widget.TextView
 import com.squareup.picasso.Picasso
 
 
-class SubRouteAdapter internal constructor(route:Route) :
+class SubRouteAdapter internal constructor(route:Route, private val routeFragmentListener: RouteFragment.RouteFragmentListener) :
     RecyclerView.Adapter<SubRouteAdapter.ViewHolder>() {
 
     private val subroutes = route.get()
@@ -39,6 +39,7 @@ class SubRouteAdapter internal constructor(route:Route) :
         val subroute = subroutes[position]
 
         if(subroute is Route.TCL) {
+            holder.container.setOnClickListener { routeFragmentListener.onStationMap(subroute.from) }
             holder.departAt.text = subroute.departAt
             holder.arriveAt.text = subroute.arriveAt
             holder.duration.text = subroute.duration

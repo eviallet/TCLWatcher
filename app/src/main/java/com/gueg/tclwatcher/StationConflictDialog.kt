@@ -39,7 +39,7 @@ class StationConflictDialog(context: Context, private val listener: StationConfl
         list = findViewById(R.id.dialog_stationconflict_checkbox)
         list.setOnCheckedChangeListener {_,_ ->
             if(!okButton.isEnabled) {
-                okButton.setTextColor(context.resources.getColor(android.R.color.holo_green_dark))
+                okButton.setTextColor(context.resources.getColor(android.R.color.holo_green_light))
                 okButton.isEnabled = true
             }
         }

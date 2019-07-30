@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.support.design.widget.FloatingActionButton
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -99,17 +101,48 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         fab = findViewById(R.id.view_stationpicker_fab)
         fab.setOnClickListener {
-            val request = Request(
-                from=from.text.toString(),
-                to=to.text.toString(),
-                timeMode= if(depArr.selectedItemPosition==0) Request.TimeMode.DEPART_AT else Request.TimeMode.ARRIVE_AT,
-                year= year,
-                month= getMonth(),
-                day= getDay(),
-                hour= timeText.text.split(":")[0].toInt(),
-                minute= timeText.text.split(":")[1].toInt()
-            )
-            listener!!.onRequestEmitted(request)
+            var canDoRequest = true
+
+            if(from.text.isEmpty()) {
+                canDoRequest = false
+                from.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
+                from.addTextChangedListener(object: TextWatcher{
+                    override fun afterTextChanged(p0: Editable?) {}
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                        if(p0 == null) return
+                        if(p0.isNotEmpty())
+                            from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                    }
+                })
+            }
+            if(to.text.isEmpty()) {
+                canDoRequest = false
+                to.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
+                to.addTextChangedListener(object: TextWatcher {
+                    override fun afterTextChanged(p0: Editable?) {}
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                        if (p0 == null) return
+                        if (p0.isNotEmpty())
+                            to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                    }
+                })
+            }
+
+            if(canDoRequest) {
+                val request = Request(
+                    from = from.text.toString(),
+                    to = to.text.toString(),
+                    timeMode = if (depArr.selectedItemPosition == 0) Request.TimeMode.DEPART_AT else Request.TimeMode.ARRIVE_AT,
+                    year = year,
+                    month = getMonth(),
+                    day = getDay(),
+                    hour = timeText.text.split(":")[0].toInt(),
+                    minute = timeText.text.split(":")[1].toInt()
+                )
+                listener!!.onRequestEmitted(request)
+            }
         }
 
         swap = findViewById(R.id.view_stationpicker_swap)
