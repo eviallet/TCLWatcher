@@ -20,7 +20,7 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
 
-                android:src="@drawable/ic_clock"
+                android:src="@drawable/ic_bookmark"
                 android:background="@null"
                 android:scaleType="fitXY"
                 android:tint="@color/homepageButtonsColor"

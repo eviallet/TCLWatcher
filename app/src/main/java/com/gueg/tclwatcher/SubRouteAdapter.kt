@@ -30,16 +30,14 @@ class SubRouteAdapter internal constructor(route:Route, private val routeFragmen
         var pic: ImageView = v.findViewById(R.id.row_subroute_pic)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.row_subroute, parent, false)
-        return ViewHolder(v)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_subroute, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val subroute = subroutes[position]
 
         if(subroute is Route.TCL) {
-            holder.container.setOnClickListener { routeFragmentListener.onStationMap(subroute.from) }
+            holder.container.setOnClickListener { routeFragmentListener.onStationMap(subroute.from, subroute.to) }
             holder.departAt.text = subroute.departAt
             holder.arriveAt.text = subroute.arriveAt
             holder.duration.text = subroute.duration

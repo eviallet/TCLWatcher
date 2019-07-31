@@ -68,31 +68,23 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     val routesFragment = RoutesFragment()
                     routesFragment.route = route
                     routesFragment.routeFragmentListener = object: RouteFragment.RouteFragmentListener {
-                        override fun onStationMap(name: String) {
+                        override fun onStationMap(nameFrom: String, nameTo: String) {
                             val intent = Intent(applicationContext, MapActivity::class.java)
-                            intent.putExtra(MapActivity.EXTRA_STATION, name)
+                            intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
+                            intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
                             startActivity(intent)
                         }
                         override fun onRouteMap(route: Route) {
                             Thread {
                                 val intent = Intent(applicationContext, MapActivity::class.java)
-                                val doubleArrayList = ArrayList<Double>()
-                                for (i in 0 until route.get().size - 1) {
-                                    val subroute = route.get()[i]
+                                val stringArrayList = ArrayList<String>()
+                                for (subroute in route.get()) {
                                     if (subroute is Route.TCL) {
-                                        val from = StationDatabase.getDatabase(applicationContext).stationDao()
-                                            .findByName(subroute.from)
-                                        val to = StationDatabase.getDatabase(applicationContext).stationDao()
-                                            .findByName(subroute.to)
-                                        doubleArrayList.add(from.lat)
-                                        doubleArrayList.add(from.lon)
-                                        doubleArrayList.add(to.lat)
-                                        doubleArrayList.add(to.lon)
+                                        stringArrayList.add(subroute.from)
+                                        stringArrayList.add(subroute.to)
                                     }
                                 }
-                                startActivity(intent
-                                    .putExtra(MapActivity.EXTRA_PATH, doubleArrayList.toDoubleArray())
-                                )
+                                startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
                             }.start()
                         }
                         override fun onBookmark(route: Route) {

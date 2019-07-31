@@ -68,7 +68,7 @@ class RouteFragment : Fragment() {
     }
 
     interface RouteFragmentListener {
-        fun onStationMap(name: String)
+        fun onStationMap(nameFrom: String, nameTo: String)
         fun onRouteMap(route: Route)
         fun onBookmark(route: Route)
         fun onShare(route: Route)

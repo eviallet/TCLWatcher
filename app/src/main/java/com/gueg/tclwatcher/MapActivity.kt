@@ -2,6 +2,7 @@ package com.gueg.tclwatcher
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
@@ -11,6 +12,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -18,27 +20,26 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 
-
-
 @Suppress("PrivatePropertyName")
 class MapActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_PATH = "com.gueg.tclwatcher.mapactivity.extra_path"
-        const val EXTRA_STATION = "com.gueg.tclwatcher.mapactivity.extra_station"
+        const val EXTRA_STATION_FROM = "com.gueg.tclwatcher.mapactivity.extra_station_from"
+        const val EXTRA_STATION_TO = "com.gueg.tclwatcher.mapactivity.extra_station_to"
     }
 
     private lateinit var map: MapView
 
     private val COLORS = arrayOf(
-        0xb32424,
-        0xcf660a,
-        0xd4e024,
-        0x8ddb2e,
-        0x389632,
-        0x0aa65d,
-        0x2a9da1,
-        0xb51058
+        "#b32424",
+        "#cf660a",
+        "#d4e024",
+        "#8ddb2e",
+        "#389632",
+        "#0aa65d",
+        "#2a9da1",
+        "#b51058"
     )
 
     private fun loadActivity() {
@@ -52,32 +53,49 @@ class MapActivity : AppCompatActivity() {
         map.setBuiltInZoomControls(false)
         map.setTileSource(TileSourceFactory.MAPNIK)
 
-        var startingGeoPoint: GeoPoint ?= null
-
         val extras = intent.extras
         if(extras != null) {
-            val doubleArray = extras.getDoubleArray(EXTRA_PATH)
-            val stationName = extras.getString(EXTRA_STATION)
-            if(doubleArray != null) {
-                for(i in 0 until doubleArray.size - 1 step 4) {
-                    val path = Polyline(map)
-                    path.color = COLORS[abs(Random.nextInt()) % COLORS.size]
-                    path.addPoint(GeoPoint(doubleArray[i], doubleArray[i + 1]))
-                    path.addPoint(GeoPoint(doubleArray[i + 2], doubleArray[i + 3]))
-                    path.width = 70f
-                    map.overlays.add(path)
-                    map.invalidate()
-                    if(i == 0) startingGeoPoint = path.points[0]
-                }
-            } else if(stationName != null) {
+            val stringArray = extras.getStringArrayList(EXTRA_PATH)
+            val from = extras.getString(EXTRA_STATION_FROM)
+            val to = extras.getString(EXTRA_STATION_TO)
+            if(stringArray != null) {
                 Thread {
-                    val station = StationDatabase.getDatabase(this).stationDao().findByName(stationName)
-                    val marker = MapOverlayProvider.getMarkerFromStation(map, station)
-                    map.overlays.add(marker)
+                    val stations = ArrayList<Station>()
+                    for (stationName in stringArray)
+                        stations.add(StationDatabase.getDatabase(applicationContext).stationDao().findByName(stationName))
+
+                    val markers = HashMap<String, Marker>()
                     runOnUiThread {
+                        for (i in 0..stations.lastIndex step 2) {
+                            val path = Polyline()
+                            val color = Color.parseColor(COLORS[abs(Random.nextInt()) % COLORS.size])
+                            path.color = color
+                            path.addPoint(GeoPoint(stations[i].lat, stations[i].lon))
+                            path.addPoint(GeoPoint(stations[i + 1].lat, stations[i + 1].lon))
+                            map.overlayManager.add(path)
+                            map.overlayManager.add(MapUtils.getMarkerFromIndex(map, (i+2)/2, MapUtils.getCenterFromPath(path), color))
+
+                            if(markers[stations[i].name] == null)
+                                markers[stations[i].name] = MapUtils.getMarkerFromStation(map, stations[i])
+                            if(markers[stations[i + 1].name] == null)
+                                markers[stations[i + 1].name] = MapUtils.getMarkerFromStation(map, stations[i + 1])
+                        }
+                        for(marker in markers)
+                            map.overlayManager.add(marker.value)
+                        map.zoomToBoundingBox(MapUtils.getBoundaries(stations), true)
+                    }
+                }.start()
+            } else if(from != null) {
+                Thread {
+                    val stationFrom = StationDatabase.getDatabase(this).stationDao().findByName(from)
+                    val stationTo = StationDatabase.getDatabase(this).stationDao().findByName(to!!)
+                    runOnUiThread {
+                        val markerFrom = MapUtils.getMarkerFromStation(map, stationFrom)
+                        val markerTo = MapUtils.getMarkerFromStation(map, stationTo)
+                        map.overlays.add(markerFrom)
+                        map.overlays.add(markerTo)
                         map.invalidate()
-                        startingGeoPoint = marker.position
-                        map.controller.setCenter(startingGeoPoint)
+                        map.zoomToBoundingBox(MapUtils.getBoundaries(arrayListOf(stationFrom, stationTo)), true)
                     }
                 }.start()
             }
@@ -93,11 +111,11 @@ class MapActivity : AppCompatActivity() {
         mapController.setZoom(18.0)
 
         when {
-            startingGeoPoint != null -> mapController.setCenter(startingGeoPoint)
             myLocation != null -> mapController.setCenter(myLocation)
             else -> mapController.setCenter(GeoPoint(45.749939, 4.864925))
         }
     }
+
 
 
 

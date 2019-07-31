@@ -19,6 +19,8 @@ class Route (var from:String, var to:String, var departureTime:String, var arriv
         return string
     }
 
+    override fun equals(other: Any?) = toString() == other.toString()
+
     abstract class SubRoute(
         val from:String="", val fromDir:String="", val to:String="",
         val departAt:String="", val arriveAt:String="", val duration:String="",
