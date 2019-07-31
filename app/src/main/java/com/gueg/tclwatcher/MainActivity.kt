@@ -12,6 +12,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.INSERT_DB
 import com.gueg.tclwatcher.LoadingFragment.LoadingText.LOAD_ONLINE
+import com.gueg.tclwatcher.map.MapActivity
+import com.gueg.tclwatcher.routes.*
+import com.gueg.tclwatcher.stations.StationParser
+import com.gueg.tclwatcher.stations.StationPicker
 
 
 class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
@@ -21,7 +25,6 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private lateinit var errorLayout: LinearLayout
     private lateinit var errorText: TextView
     private var errorShown: Boolean = false
-
 
     private var loadingFragment = LoadingFragment()
     private var homepageFramgent = HomepageFragment()

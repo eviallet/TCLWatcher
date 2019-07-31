@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.stations
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

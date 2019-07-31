@@ -1,6 +1,8 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 import android.util.Log
+import com.gueg.tclwatcher.MainActivity
+import com.gueg.tclwatcher.stations.StationConflictDialog
 import org.jsoup.HttpStatusException
 import java.net.SocketTimeoutException
 
@@ -52,8 +54,9 @@ class RouteParserExceptionHandler(private val activity: MainActivity, private va
                 override fun onCancelled() {
                     activity.setError("Impossible de poursuivre.")
                 }
+
                 override fun onValidated(value: String) {
-                    if(from)
+                    if (from)
                         request.refineFrom(value)
                     else
                         request.refineTo(value)

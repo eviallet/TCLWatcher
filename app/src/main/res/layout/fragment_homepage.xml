@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+
+        android:padding="4dp">
+    <include layout="@layout/menu_homepage" />
+    <com.gueg.tclwatcher.stations.StationPicker
+            android:id="@+id/fragment_homepage_stationpicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:tag="transition_picker"
+            android:transitionName="transition_picker"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:text="@string/fragment_homepage_bookmarks"
+
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"/>
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_homepage_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
 
-            android:padding="4dp">
-        <include layout="@layout/menu_homepage" />
-        <com.gueg.tclwatcher.StationPicker
-                android:id="@+id/fragment_homepage_stationpicker"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            android:layout_margin="5dp"/>
 
-                android:tag="transition_picker"
-                android:transitionName="transition_picker"/>
-
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

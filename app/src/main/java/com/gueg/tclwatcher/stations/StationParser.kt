@@ -29,7 +29,7 @@
 }
 */
 
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.stations
 
 import android.os.AsyncTask
 import org.json.JSONObject
@@ -75,7 +75,8 @@ class StationParser {
         }
 
         fun parseStations() : ArrayList<Station> {
-            val stations = LoadStationsJSON().execute(STATIONS_LINK).get()
+            val stations = LoadStationsJSON()
+                .execute(STATIONS_LINK).get()
             val array = stations.getJSONArray("features")
             val ans = ArrayList<Station>()
 

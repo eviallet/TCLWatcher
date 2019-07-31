@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 import java.net.URLEncoder
 import java.util.*
@@ -6,7 +6,8 @@ import java.util.*
 class Request(
     var from:String, var to:String,
     private var day:Int=-1, private var month:Int=-1, private var year:Int=-1, private var hour:Int=-1, private var minute:Int=-1,
-    private val timeMode: TimeMode=TimeMode.DEPART_AT) {
+    private val timeMode: TimeMode = TimeMode.DEPART_AT
+) {
 
     private var hasBeenRefined = false
 

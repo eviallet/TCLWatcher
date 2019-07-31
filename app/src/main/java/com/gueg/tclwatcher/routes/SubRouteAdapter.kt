@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 
 import android.support.v7.widget.RecyclerView
@@ -9,10 +9,11 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.gueg.tclwatcher.R
 import com.squareup.picasso.Picasso
 
 
-class SubRouteAdapter internal constructor(route:Route, private val routeFragmentListener: RouteFragment.RouteFragmentListener) :
+class SubRouteAdapter internal constructor(route: Route, private val routeFragmentListener: RouteFragment.RouteFragmentListener) :
     RecyclerView.Adapter<SubRouteAdapter.ViewHolder>() {
 
     private val subroutes = route.get()

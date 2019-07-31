@@ -1,8 +1,8 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 import android.util.Log
-import com.gueg.tclwatcher.Route.TCL
-import com.gueg.tclwatcher.Route.Walk
+import com.gueg.tclwatcher.routes.Route.TCL
+import com.gueg.tclwatcher.routes.Route.Walk
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 
@@ -87,7 +87,12 @@ class RouteParser {
                                 }
                             }
 
-                            throw StationConflictError(choicesFrom, valuesFrom, choicesTo, valuesTo)
+                            throw StationConflictError(
+                                choicesFrom,
+                                valuesFrom,
+                                choicesTo,
+                                valuesTo
+                            )
                         } catch(e: IndexOutOfBoundsException) {
                             throw ParseError("Erreur inconnue")
                         }

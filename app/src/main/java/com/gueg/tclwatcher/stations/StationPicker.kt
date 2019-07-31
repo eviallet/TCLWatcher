@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.stations
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -12,6 +12,8 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.routes.Request
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -32,7 +34,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private var dateSpinner: Spinner
     private var timeLayout: LinearLayout
     private var timeText: TextView
-    var listener: StationPickerListener ?= null
+    var listener: StationPickerListener?= null
     private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
     private lateinit var autoCompleteAdapter: ArrayAdapter<String>
 
@@ -43,7 +45,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         to = findViewById(R.id.view_stationpicker_to)
 
         depArr = findViewById(R.id.view_stationpicker_param_dep_arr)
-        val depArrAdapter = ArrayAdapter.createFromResource(context, R.array.spinner_dep_arr, R.layout.view_spinner)
+        val depArrAdapter = ArrayAdapter.createFromResource(context,
+            R.array.spinner_dep_arr,
+            R.layout.view_spinner
+        )
         depArrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         depArr.adapter = depArrAdapter
         depArr.setSelection(0)
@@ -53,7 +58,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         dateText.text = context.resources.getStringArray(R.array.spinner_date)[0]
 
         dateSpinner = findViewById(R.id.view_stationpicker_param_date_spinner)
-        val dateAdapter = ArrayAdapter.createFromResource(context, R.array.spinner_date, R.layout.view_spinner_date)
+        val dateAdapter = ArrayAdapter.createFromResource(context,
+            R.array.spinner_date,
+            R.layout.view_spinner_date
+        )
         dateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         dateSpinner.adapter = dateAdapter
         dateSpinner.setSelection(0)

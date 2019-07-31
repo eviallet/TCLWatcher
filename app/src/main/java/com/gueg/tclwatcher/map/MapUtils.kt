@@ -1,8 +1,10 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.map
 
 import android.content.Intent
 import android.net.Uri
 import android.widget.TextView
+import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.stations.Station
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView

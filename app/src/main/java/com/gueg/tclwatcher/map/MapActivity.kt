@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.map
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -8,6 +8,9 @@ import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.StationDatabase
+import com.gueg.tclwatcher.stations.Station
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -73,12 +76,24 @@ class MapActivity : AppCompatActivity() {
                             path.addPoint(GeoPoint(stations[i].lat, stations[i].lon))
                             path.addPoint(GeoPoint(stations[i + 1].lat, stations[i + 1].lon))
                             map.overlayManager.add(path)
-                            map.overlayManager.add(MapUtils.getMarkerFromIndex(map, (i+2)/2, MapUtils.getCenterFromPath(path), color))
+                            map.overlayManager.add(
+                                MapUtils.getMarkerFromIndex(
+                                    map,
+                                    (i + 2) / 2,
+                                    MapUtils.getCenterFromPath(path),
+                                    color
+                                )
+                            )
 
                             if(markers[stations[i].name] == null)
-                                markers[stations[i].name] = MapUtils.getMarkerFromStation(map, stations[i])
+                                markers[stations[i].name] =
+                                    MapUtils.getMarkerFromStation(map, stations[i])
                             if(markers[stations[i + 1].name] == null)
-                                markers[stations[i + 1].name] = MapUtils.getMarkerFromStation(map, stations[i + 1])
+                                markers[stations[i + 1].name] =
+                                    MapUtils.getMarkerFromStation(
+                                        map,
+                                        stations[i + 1]
+                                    )
                         }
                         for(marker in markers)
                             map.overlayManager.add(marker.value)
@@ -90,12 +105,19 @@ class MapActivity : AppCompatActivity() {
                     val stationFrom = StationDatabase.getDatabase(this).stationDao().findByName(from)
                     val stationTo = StationDatabase.getDatabase(this).stationDao().findByName(to!!)
                     runOnUiThread {
-                        val markerFrom = MapUtils.getMarkerFromStation(map, stationFrom)
+                        val markerFrom =
+                            MapUtils.getMarkerFromStation(map, stationFrom)
                         val markerTo = MapUtils.getMarkerFromStation(map, stationTo)
                         map.overlays.add(markerFrom)
                         map.overlays.add(markerTo)
                         map.invalidate()
-                        map.zoomToBoundingBox(MapUtils.getBoundaries(arrayListOf(stationFrom, stationTo)), true)
+                        map.zoomToBoundingBox(
+                            MapUtils.getBoundaries(
+                                arrayListOf(
+                                    stationFrom,
+                                    stationTo
+                                )
+                            ), true)
                     }
                 }.start()
             }

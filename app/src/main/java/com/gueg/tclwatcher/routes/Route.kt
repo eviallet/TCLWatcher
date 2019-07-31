@@ -1,10 +1,10 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 class Route (var from:String, var to:String, var departureTime:String, var arrivalTime:String, var totalDuration:String, var date:String, var prev:String, var next:String) {
 
     private val subroutes = ArrayList<SubRoute>()
 
-    fun add(subroute:SubRoute) {
+    fun add(subroute: SubRoute) {
         subroutes.add(subroute)
     }
 

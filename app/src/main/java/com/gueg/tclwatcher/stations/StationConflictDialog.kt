@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.stations
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import com.gueg.tclwatcher.R
 
 class StationConflictDialog(context: Context, private val listener: StationConflictListener, private val from: Boolean,
                             private val choices: ArrayList<String>, private val values: ArrayList<String>) : Dialog(context) {

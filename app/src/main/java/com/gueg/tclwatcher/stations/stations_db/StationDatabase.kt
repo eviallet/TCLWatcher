@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.gueg.tclwatcher.stations_db.StationDao
+import com.gueg.tclwatcher.stations.Station
+import com.gueg.tclwatcher.stations.stations_db.StationDao
 
 @Database(entities = [Station::class], version = 1, exportSchema = false)
 abstract class StationDatabase : RoomDatabase() {

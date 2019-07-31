@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 import android.app.Activity
 import android.os.Bundle
@@ -10,6 +10,8 @@ import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.gueg.tclwatcher.*
+import com.gueg.tclwatcher.stations.StationPicker
 
 class RoutesFragment: Fragment() {
 
@@ -28,7 +30,7 @@ class RoutesFragment: Fragment() {
     lateinit var routeFragmentListener: RouteFragment.RouteFragmentListener
 
     lateinit var stationPicker: StationPicker
-    var tempStationPickerData: StationPicker ?= null
+    var tempStationPickerData: StationPicker?= null
         set(value) {
             if(::stationPicker.isInitialized)
                 stationPicker.initFrom(value!!)
@@ -112,11 +114,19 @@ class RoutesFragment: Fragment() {
         fun loadPrevOrNext(prevOrNext: Int, route: Route = routes[viewPager.currentItem]) {
             val url = if (prevOrNext == PREV) route.prev else route.next
             val request = Request(route.from, route.to)
-            RouteParser.parseRoute(request, object : RouteParser.RouteParserListener {
-                override fun onRouteParsed(route: Route) {
-                    add(prevOrNext, route = route)
-                }
-            }, url = url, uncaughtExceptionHandler = RouteParserExceptionHandler(activity as MainActivity, request))
+            RouteParser.parseRoute(
+                request,
+                object : RouteParser.RouteParserListener {
+                    override fun onRouteParsed(route: Route) {
+                        add(prevOrNext, route = route)
+                    }
+                },
+                url = url,
+                uncaughtExceptionHandler = RouteParserExceptionHandler(
+                    activity as MainActivity,
+                    request
+                )
+            )
         }
 
         override fun getCount() = routes.size

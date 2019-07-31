@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-
+import com.gueg.tclwatcher.map.MapActivity
+import com.gueg.tclwatcher.stations.Station
+import com.gueg.tclwatcher.stations.StationPicker
 
 
 class HomepageFragment : Fragment() {
@@ -17,7 +19,7 @@ class HomepageFragment : Fragment() {
 
     private lateinit var stationPickerListener: StationPicker.StationPickerListener
     private lateinit var stations: List<Station>
-    var tempStationPickerData: StationPicker ?= null
+    var tempStationPickerData: StationPicker?= null
         set(value) {
             if(::stationPicker.isInitialized)
                 stationPicker.initFrom(value!!)

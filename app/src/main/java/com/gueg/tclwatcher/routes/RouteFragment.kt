@@ -1,4 +1,4 @@
-package com.gueg.tclwatcher
+package com.gueg.tclwatcher.routes
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -10,6 +10,8 @@ import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.VerticalItemDecoration
 
 
 class RouteFragment : Fragment() {
@@ -31,7 +33,7 @@ class RouteFragment : Fragment() {
     private lateinit var date: TextView
 
     private lateinit var adapter: SubRouteAdapter
-    lateinit var route:Route
+    lateinit var route: Route
 
     lateinit var routeFragmentListener: RouteFragmentListener
 

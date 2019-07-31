@@ -1,7 +1,7 @@
-package com.gueg.tclwatcher.stations_db
+package com.gueg.tclwatcher.stations.stations_db
 
 import androidx.room.*
-import com.gueg.tclwatcher.Station
+import com.gueg.tclwatcher.stations.Station
 
 @Dao
 interface StationDao {
