@@ -26,6 +26,8 @@ class RouteParser {
                 Log.d(":-:$TAG", finalUrl)
                 val page = Jsoup.connect(finalUrl).get()
 
+                val date = page.select("input[name=selectedDate]").first().attr("value").toString() // 2019|7|31
+
                 val prev = page.getElementsByClass("TRAJET-prec").attr("href")
                 val next = page.getElementsByClass("TRAJET-suiv").attr("href")
 
@@ -35,7 +37,7 @@ class RouteParser {
 
                 val route = Route(
                     from = request.from, to = request.to,
-                    departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength,
+                    departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength, date = date,
                     prev = prev, next = next
                 )
 
