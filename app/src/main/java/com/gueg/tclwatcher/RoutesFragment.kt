@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,11 +120,7 @@ class RoutesFragment: Fragment() {
         }
 
         override fun getCount() = routes.size
-        override fun getItem(p0: Int): Fragment {
-            Log.d(":-:","============= getItem $p0 =============")
-            for(r in routes) Log.d(":-:",r.departureTime)
-            return RouteFragment.from(routes[p0]).with(routeFragmentListener)
-        }
+        override fun getItem(p0: Int) = RouteFragment.from(routes[p0]).with(routeFragmentListener)
     }
 
 }

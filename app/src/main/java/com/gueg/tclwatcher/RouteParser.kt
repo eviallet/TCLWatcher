@@ -12,10 +12,18 @@ class RouteParser {
     companion object {
         private const val TAG = "RouteParser"
 
+        private val threads = ArrayList<Thread>()
+
+        fun cancel() {
+            for(t in threads)
+                t?.interrupt()
+            threads.clear()
+        }
+
         @Throws(ParseError::class)
         fun parseRoute(request: Request, routeParserListener: RouteParserListener, url: String="",
                        uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()) {
-            Thread {
+            val t = Thread {
                 var finalUrl = if(url.isEmpty()) request.toString() else url
 
                 if (!finalUrl.contains("http://") && !finalUrl.contains("https://")) {
@@ -121,10 +129,13 @@ class RouteParser {
 
                 routeParserListener.onRouteParsed(route)
 
+                threads.remove(Thread.currentThread())
+
             }.apply {
                 this.uncaughtExceptionHandler = uncaughtExceptionHandler
                 start()
             }
+            threads.add(t)
         }
     }
 

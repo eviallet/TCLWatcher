@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     }
 
     override fun onRequestEmitted(request: Request) {
+        RouteParser.cancel()
         RouteParser.parseRoute(request, object : RouteParser.RouteParserListener {
             override fun onRouteParsed(route: Route) {
                 runOnUiThread {

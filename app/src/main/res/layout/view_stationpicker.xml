@@ -38,7 +38,7 @@
 
                     android:singleLine="true"
                     android:inputType="textAutoComplete"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:textSize="15sp"
 
                     android:layout_toStartOf="@id/view_stationpicker_swap"/>

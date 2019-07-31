@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -40,6 +41,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         from = findViewById(R.id.view_stationpicker_from)
         to = findViewById(R.id.view_stationpicker_to)
+
         depArr = findViewById(R.id.view_stationpicker_param_dep_arr)
         val depArrAdapter = ArrayAdapter.createFromResource(context, R.array.spinner_dep_arr, R.layout.view_spinner)
         depArrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -143,6 +145,17 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 )
                 listener!!.onRequestEmitted(request)
             }
+        }
+
+        from.setOnEditorActionListener { _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_NEXT)
+                to.requestFocus()
+            false
+        }
+        to.setOnEditorActionListener { _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE)
+                fab.performClick()
+            false
         }
 
         swap = findViewById(R.id.view_stationpicker_swap)
