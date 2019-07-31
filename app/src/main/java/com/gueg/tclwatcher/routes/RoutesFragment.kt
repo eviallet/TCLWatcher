@@ -10,7 +10,9 @@ import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.gueg.tclwatcher.*
+import com.gueg.tclwatcher.LoadingView
+import com.gueg.tclwatcher.MainActivity
+import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.stations.StationPicker
 
 class RoutesFragment: Fragment() {
@@ -57,11 +59,11 @@ class RoutesFragment: Fragment() {
             override fun onPageSelected(position: Int) {
                 when (position) {
                     0 -> {
-                        pagerAdapter.loadPrevOrNext(PREV)
+                        pagerAdapter.loadPrevOrNext(PREV, index = position)
                         leftLoadingView.loading = true
                     }
                     pagerAdapter.count - 1 -> {
-                        pagerAdapter.loadPrevOrNext(NEXT)
+                        pagerAdapter.loadPrevOrNext(NEXT, index = position)
                         rightLoadingView.loading = true
                     }
                     else -> {
@@ -88,10 +90,10 @@ class RoutesFragment: Fragment() {
             loadPrevOrNext(NEXT, route)
         }
 
-        private fun add(pos: Int = -1, route: Route) {
+        private fun add(pos: Int = -1, route: Route, index: Int = 0) {
             handler.post {
                 if(!routes.contains(route)) {
-                    val viewPagerPos = viewPager.currentItem
+                    val viewPagerPos = if(index!=0) index else viewPager.currentItem
                     when (pos) {
                         PREV -> routes.add(viewPagerPos, route)
                         else -> routes.add(viewPagerPos + 1, route)
@@ -111,14 +113,14 @@ class RoutesFragment: Fragment() {
             }
         }
 
-        fun loadPrevOrNext(prevOrNext: Int, route: Route = routes[viewPager.currentItem]) {
+        fun loadPrevOrNext(prevOrNext: Int, route: Route = routes[viewPager.currentItem], index: Int = 0) {
             val url = if (prevOrNext == PREV) route.prev else route.next
             val request = Request(route.from, route.to)
             RouteParser.parseRoute(
                 request,
                 object : RouteParser.RouteParserListener {
                     override fun onRouteParsed(route: Route) {
-                        add(prevOrNext, route = route)
+                        add(prevOrNext, route, index)
                     }
                 },
                 url = url,
