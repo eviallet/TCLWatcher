@@ -65,36 +65,32 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         RouteParser.cancel()
         RouteParser.parseRoute(request, object : RouteParser.RouteParserListener {
             override fun onRouteParsed(route: Route) {
-                runOnUiThread {
-                    val routesFragment = RoutesFragment()
-                    routesFragment.route = route
-                    routesFragment.routeFragmentListener = object: RouteFragment.RouteFragmentListener {
-                        override fun onStationMap(nameFrom: String, nameTo: String) {
-                            val intent = Intent(applicationContext, MapActivity::class.java)
-                            intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
-                            intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
-                            startActivity(intent)
-                        }
-                        override fun onRouteMap(route: Route) {
-                            Thread {
-                                val intent = Intent(applicationContext, MapActivity::class.java)
-                                val stringArrayList = ArrayList<String>()
-                                for (subroute in route.get()) {
-                                    if (subroute is Route.TCL) {
-                                        stringArrayList.add(subroute.from)
-                                        stringArrayList.add(subroute.to)
-                                    }
-                                }
-                                startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
-                            }.start()
-                        }
-                        override fun onBookmark(route: Route) {
-                        }
-                        override fun onShare(route: Route) {
-                        }
+                val routesFragment = RoutesFragment()
+                routesFragment.route = route
+                routesFragment.routeFragmentListener = object: RouteFragment.RouteFragmentListener {
+                    override fun onStationMap(nameFrom: String, nameTo: String) {
+                        val intent = Intent(applicationContext, MapActivity::class.java)
+                        intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
+                        intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
+                        startActivity(intent)
                     }
-                    setFragment(routesFragment)
+                    override fun onRouteMap(route: Route) {
+                        val intent = Intent(applicationContext, MapActivity::class.java)
+                        val stringArrayList = ArrayList<String>()
+                        for (subroute in route.get()) {
+                            if (subroute is Route.TCL) {
+                                stringArrayList.add(subroute.from)
+                                stringArrayList.add(subroute.to)
+                            }
+                        }
+                        startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
+                    }
+                    override fun onBookmark(route: Route) {
+                    }
+                    override fun onShare(route: Route) {
+                    }
                 }
+                setFragment(routesFragment)
             }
         }, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request))
     }

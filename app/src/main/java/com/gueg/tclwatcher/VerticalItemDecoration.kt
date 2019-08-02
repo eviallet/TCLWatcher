@@ -13,8 +13,6 @@ class VerticalItemDecoration(private val verticalSpaceHeight: Int) : RecyclerVie
             outRect.top = verticalSpaceHeight
             first = false
         }
-        if (parent.getChildAdapterPosition(view) != parent.adapter!!.itemCount - 1) {
-            outRect.bottom = verticalSpaceHeight
-        }
+        outRect.bottom = verticalSpaceHeight
     }
 }

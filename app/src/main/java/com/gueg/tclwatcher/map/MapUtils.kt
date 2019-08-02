@@ -1,16 +1,22 @@
 package com.gueg.tclwatcher.map
 
 import android.content.Intent
+import android.graphics.Paint
 import android.net.Uri
 import android.widget.TextView
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.stations.Station
+import org.osmdroid.api.IGeoPoint
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
+import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions
+import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme
 
 
 class MapUtils {
@@ -32,6 +38,30 @@ class MapUtils {
                 true
             }
             return m
+        }
+
+        fun getFastMarkersFromStations(map: MapView, stations: List<Station>): SimpleFastPointOverlay {
+            val points = ArrayList<IGeoPoint>()
+
+            for(station in stations)
+                points.add(LabelledGeoPoint(station.lat, station.lon, station.name))
+
+            val pt = SimplePointTheme(points, true)
+
+            val textStyle = Paint()
+            textStyle.style = Paint.Style.FILL
+            textStyle.color = map.context.resources.getColor(R.color.colorAccent)
+            textStyle.textAlign = Paint.Align.CENTER
+            textStyle.textSize = 30f
+            textStyle.isFakeBoldText = true
+
+            val opt = SimpleFastPointOverlayOptions.getDefaultStyle()
+                .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
+                .setRadius(13f).setIsClickable(true).setTextStyle(textStyle)
+                .setLabelPolicy(SimpleFastPointOverlayOptions.LabelPolicy.DENSITY_THRESHOLD).setMaxNShownLabels(20)
+                .setPointStyle(textStyle)
+
+            return SimpleFastPointOverlay(pt, opt)
         }
 
         fun getMarkerFromIndex(map: MapView, index: Int, geoPoint: GeoPoint, color: Int): Marker {
@@ -58,7 +88,7 @@ class MapUtils {
         }
 
 
-        fun getBoundaries(stations: ArrayList<Station>): BoundingBox {
+        fun getBoundaries(stations: List<Station>): BoundingBox {
             var latMin = 90.0
             var latMax = -90.0
             var lonMin = 90.0

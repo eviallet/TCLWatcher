@@ -121,6 +121,15 @@ class MapActivity : AppCompatActivity() {
                     }
                 }.start()
             }
+        } else {
+            Thread {
+                val stations = StationDatabase.getDatabase(this).stationDao().all
+                map.overlays.add(MapUtils.getFastMarkersFromStations(map, stations))
+                runOnUiThread {
+                    map.invalidate()
+                    map.zoomToBoundingBox(MapUtils.getBoundaries(stations), true)
+                }
+            }.start()
         }
 
         // Position overlay

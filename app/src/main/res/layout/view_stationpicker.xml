@@ -129,15 +129,46 @@
             </LinearLayout>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
-    <android.support.design.widget.FloatingActionButton
-            android:id="@+id/view_stationpicker_fab"
+    <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:src="@drawable/ic_directions"
-            app:fabSize="normal"
-
+            android:elevation="5dp"
             android:layout_gravity="end"
-            android:layout_marginEnd="35dp"
-            android:layout_marginTop="-28dp"/>
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="-40dp">
+        <RelativeLayout
+                android:id="@+id/view_stationpicker_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:visibility="invisible"
+
+                android:clipChildren="false"
+                android:clipToPadding="false">
+            <ProgressBar
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+
+                    android:indeterminate="true"
+                    android:progressTint="@android:color/white"
+                    android:background="@color/colorAccent"
+
+                    android:layout_centerInParent="true"/>
+            <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    app:fabSize="normal"
+                    app:useCompatPadding="true"/>
+        </RelativeLayout>
+        <android.support.design.widget.FloatingActionButton
+                android:id="@+id/view_stationpicker_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:src="@drawable/ic_directions"
+                app:fabSize="normal"
+                app:useCompatPadding="true"/>
+    </RelativeLayout>
 </LinearLayout>

@@ -24,6 +24,7 @@ import kotlin.collections.ArrayList
 
 class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout(context, attrs) {
 
+    private var loading: RelativeLayout
     private var from: AutoCompleteTextView
     private var to: AutoCompleteTextView
     private var fab: FloatingActionButton
@@ -43,6 +44,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         from = findViewById(R.id.view_stationpicker_from)
         to = findViewById(R.id.view_stationpicker_to)
+
+        loading = findViewById(R.id.view_stationpicker_loading)
 
         depArr = findViewById(R.id.view_stationpicker_param_dep_arr)
         val depArrAdapter = ArrayAdapter.createFromResource(context,
@@ -141,6 +144,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
             }
 
             if(canDoRequest) {
+                loading.visibility = View.VISIBLE
                 val request = Request(
                     from = from.text.toString(),
                     to = to.text.toString(),
