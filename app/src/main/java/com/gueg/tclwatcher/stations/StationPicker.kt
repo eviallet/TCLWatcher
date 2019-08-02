@@ -1,5 +1,6 @@
 package com.gueg.tclwatcher.stations
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -12,19 +13,16 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import com.github.ybq.android.spinkit.SpinKitView
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.routes.Request
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-
-
-
-
 class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout(context, attrs) {
 
-    private var loading: RelativeLayout
+    private var loading: SpinKitView
     private var from: AutoCompleteTextView
     private var to: AutoCompleteTextView
     private var fab: FloatingActionButton
@@ -145,6 +143,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
             if(canDoRequest) {
                 loading.visibility = View.VISIBLE
+                fab.animate().rotation(90f).alpha(0f).withEndAction {
+                    @SuppressLint("RestrictedApi")
+                    fab.visibility = View.INVISIBLE
+                }
                 val request = Request(
                     from = from.text.toString(),
                     to = to.text.toString(),
