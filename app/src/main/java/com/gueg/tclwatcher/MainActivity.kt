@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private var errorShown: Boolean = false
 
     private var loadingFragment = LoadingFragment()
-    private var homepageFramgent = HomepageFragment()
+    private var homepageFragment = HomepageFragment()
     private var currentFragment: Fragment ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         errorLayout = findViewById(R.id.activity_main_error_layout)
         errorText = findViewById(R.id.activity_main_error_text)
 
-        homepageFramgent.setStationPickerListener(this)
+        homepageFragment.setStationPickerListener(this)
 
         setFragment(loadingFragment)
 
@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 StationDatabase.getDatabase(applicationContext).stationDao().insertAll(stations)
             }
             runOnUiThread {
-                homepageFramgent.setStations(stations)
-                setFragment(homepageFramgent)
+                homepageFragment.setStations(stations)
+                setFragment(homepageFragment)
             }
         }).start()
     }
@@ -102,9 +102,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             currentFragment!!.exitTransition = Explode(this, null)
 
             if(fragment is HomepageFragment)
-                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag<StationPicker>("transition_picker")
+                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag("transition_picker")
             else if(fragment is RoutesFragment)
-                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag<StationPicker>("transition_picker")
+                fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag("transition_picker")
 
             supportFragmentManager.beginTransaction()
                 .addSharedElement(currentFragment!!.view!!.findViewWithTag("transition_picker"), "transition_picker")
@@ -117,20 +117,25 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     override fun onBackPressed() {
         if(currentFragment is RoutesFragment)
-            setFragment(homepageFramgent)
+            setFragment(homepageFragment)
         else
             super.onBackPressed()
     }
 
 
     fun setError(text: String) {
-        errorText.text = text
-        if(!errorShown) {
-            errorShown = true
-            errorLayout.animate().translationYBy(-errorLayout.height.toFloat()+2)
-            Handler().postDelayed({
-                errorLayout.animate().translationY(0f).withEndAction { errorShown = false }
-            }, 3000)
+        runOnUiThread {
+            errorText.text = text
+            if (!errorShown) {
+                errorShown = true
+                errorLayout.animate().translationYBy(-errorLayout.height.toFloat() + 2)
+                Handler().postDelayed({
+                    errorLayout.animate().translationY(0f).withEndAction { errorShown = false }
+                }, 3000)
+            }
+
+            if(currentFragment is HomepageFragment)
+                homepageFragment.onError()
         }
     }
 

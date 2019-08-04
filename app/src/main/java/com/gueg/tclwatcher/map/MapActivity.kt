@@ -33,6 +33,7 @@ class MapActivity : AppCompatActivity() {
     }
 
     private lateinit var map: MapView
+    private var isInit = false
 
     private val COLORS = arrayOf(
         "#b32424",
@@ -49,6 +50,7 @@ class MapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_map)
 
         map = findViewById(R.id.activity_map_map)
+        isInit = true
 
         // Map configuration
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
@@ -194,15 +196,19 @@ class MapActivity : AppCompatActivity() {
 
     public override fun onResume() {
         super.onResume()
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
-        map.onResume() //needed for compass, my location overlays, v6.0.0 and up
+        if(isInit) {
+            Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
+            map.onResume() //needed for compass, my location overlays, v6.0.0 and up
+        }
     }
 
     public override fun onPause() {
         super.onPause()
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        Configuration.getInstance().save(this, prefs)
-        map.onPause()  //needed for compass, my location overlays, v6.0.0 and up
+        if(isInit) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+            Configuration.getInstance().save(this, prefs)
+            map.onPause()  //needed for compass, my location overlays, v6.0.0 and up
+        }
     }
 
 

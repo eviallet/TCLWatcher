@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.text.Editable
 import android.text.TextWatcher
@@ -36,6 +37,9 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     var listener: StationPickerListener?= null
     private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
     private lateinit var autoCompleteAdapter: ArrayAdapter<String>
+
+    var refinedFrom: String ?= null
+    var refinedTo: String ?= null
 
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
@@ -112,41 +116,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         fab = findViewById(R.id.view_stationpicker_fab)
         fab.setOnClickListener {
-            var canDoRequest = true
-
-            if(from.text.isEmpty()) {
-                canDoRequest = false
-                from.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
-                from.addTextChangedListener(object: TextWatcher{
-                    override fun afterTextChanged(p0: Editable?) {}
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        if(p0 == null) return
-                        if(p0.isNotEmpty())
-                            from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                    }
-                })
-            }
-            if(to.text.isEmpty()) {
-                canDoRequest = false
-                to.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
-                to.addTextChangedListener(object: TextWatcher {
-                    override fun afterTextChanged(p0: Editable?) {}
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        if (p0 == null) return
-                        if (p0.isNotEmpty())
-                            to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                    }
-                })
-            }
-
-            if(canDoRequest) {
-                loading.visibility = View.VISIBLE
-                fab.animate().rotation(90f).alpha(0f).withEndAction {
-                    @SuppressLint("RestrictedApi")
-                    fab.visibility = View.INVISIBLE
-                }
+            setLoading(true)
+            if(checkText()) {
                 val request = Request(
                     from = from.text.toString(),
                     to = to.text.toString(),
@@ -157,6 +128,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                     hour = timeText.text.split(":")[0].toInt(),
                     minute = timeText.text.split(":")[1].toInt()
                 )
+                if(refinedFrom != null)
+                    request.refineFrom(refinedFrom!!)
+                if(refinedTo != null)
+                    request.refineTo(refinedTo!!)
                 listener!!.onRequestEmitted(request)
             }
         }
@@ -213,7 +188,85 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         autoCompleteAdapter = picker.autoCompleteAdapter
         from.setAdapter(autoCompleteAdapter)
         to.setAdapter(autoCompleteAdapter)
+        refinedFrom = picker.refinedFrom
+        refinedTo = picker.refinedTo
     }
+
+    @SuppressLint("RestrictedApi")
+    fun setLoading(loading: Boolean) {
+        if(loading) {
+            this.loading.visibility = View.VISIBLE
+            fab.animate().rotation(90f).alpha(0f).withEndAction { fab.visibility = View.INVISIBLE }
+        } else {
+            this.loading.visibility = View.GONE
+            fab.visibility = View.VISIBLE
+            fab.animate().rotation(0f).alpha(1f)
+        }
+    }
+
+    fun checkText(): Boolean {
+        var isTextNotEmpty = true
+
+        if(from.text.isEmpty()) {
+            isTextNotEmpty = false
+            from.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
+            from.addTextChangedListener(object: TextWatcher{
+                override fun afterTextChanged(p0: Editable?) {}
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if(p0 == null) return
+                    if(p0.isNotEmpty())
+                        from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                }
+            })
+        }
+        if(to.text.isEmpty()) {
+            isTextNotEmpty = false
+            to.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
+            to.addTextChangedListener(object: TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {}
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (p0 == null) return
+                    if (p0.isNotEmpty())
+                        to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                }
+            })
+        }
+
+        return isTextNotEmpty
+    }
+
+    fun from() = from.text.toString()
+    fun to() = to.text.toString()
+
+    fun fill(from: String, to: String) {
+        CharacterAnimator(this.from, from) {
+            CharacterAnimator(this.to, to).start()
+        }.start()
+    }
+
+    private inner class CharacterAnimator(val view: EditText, val text: String, val delay: Long = 4, val onFinish: () -> Unit = {}) : Runnable {
+        private var index = 0
+        private val handler = Handler()
+
+        fun start() {
+            view.clearFocus()
+            view.text.clear()
+            handler.postDelayed(this, delay)
+        }
+
+        override fun run() {
+            view.setText(text.subSequence(0, index++))
+            if(index != text.length + 1)
+                handler.postDelayed(this, delay)
+            else
+                onFinish()
+        }
+    }
+
+
+    // =============== DATE UTILS ===============
 
     private fun now(): String {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
@@ -241,6 +294,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         }
         else -> dateText.text.split("/")[0].replace("le ","").toInt()
     }
+
+
+
+    // =============== INIT ===============
 
     fun setStations(stations: List<Station>) {
         val stationsStrings = ArrayList<String>(stations.size)

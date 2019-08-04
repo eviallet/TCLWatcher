@@ -5,9 +5,9 @@ import com.gueg.tclwatcher.MainActivity
 import com.gueg.tclwatcher.stations.StationConflictDialog
 import org.jsoup.HttpStatusException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
-class RouteParserExceptionHandler(private val activity: MainActivity, private val request: Request) : Thread.UncaughtExceptionHandler {
-
+class RouteParserExceptionHandler(private val activity: MainActivity, private val request: Request, private val onRefined: ((refined: Request) -> Unit) ?= null) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(thread: Thread?, throwable: Throwable?) {
         activity.runOnUiThread {
@@ -24,24 +24,34 @@ class RouteParserExceptionHandler(private val activity: MainActivity, private va
                                 // wait for user choice again
                                 showConflictDialog(false, request, throwable.choicesTo, throwable.valuesTo) {
                                     // and emit request
-                                    activity.onRequestEmitted(request)
+                                    if(onRefined != null)
+                                        onRefined!!(request)
+                                    else
+                                        activity.onRequestEmitted(request)
                                 }
                             } else {
                                 // if there was only "from" conflict, emit the fixed request now
                                 request.refineTo(throwable.valuesTo[0])
-                                activity.onRequestEmitted(request)
+                                if(onRefined != null)
+                                    onRefined!!(request)
+                                else
+                                    activity.onRequestEmitted(request)
                             }
                         }
                     } else {
                         // if there was only "to" conflict, wait for user input and fire the fixed request
                         request.refineFrom(throwable.valuesFrom[0])
                         showConflictDialog(false, request, throwable.choicesTo, throwable.valuesTo) {
-                            activity.onRequestEmitted(request)
+                            if(onRefined != null)
+                                onRefined!!(request)
+                            else
+                                activity.onRequestEmitted(request)
                         }
                     }
                 }
                 is SocketTimeoutException -> activity.setError("Le serveur ne répond pas.")
                 is HttpStatusException -> activity.setError("Le serveur est hors ligne.")
+                is UnknownHostException -> activity.setError("Aucune connexion internet.")
                 else -> activity.setError("Une erreur inconnue est survenue.")
             }
         }

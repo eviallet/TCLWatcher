@@ -116,7 +116,7 @@
                         android:layout_height="25dp"
 
                         android:src="@drawable/ic_map"
-                        android:background="@null"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitXY"
                         android:tint="@color/homepageButtonsColor"
 
@@ -127,7 +127,7 @@
                         android:layout_height="25dp"
 
                         android:src="@drawable/ic_share"
-                        android:background="@null"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitXY"
                         android:tint="@color/homepageButtonsColor"
 
@@ -138,7 +138,7 @@
                         android:layout_height="25dp"
 
                         android:src="@drawable/ic_bookmark_border"
-                        android:background="@null"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitXY"
                         android:tint="@color/homepageButtonsColor"
 

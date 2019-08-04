@@ -10,6 +10,7 @@
     <string name="cancel">Annuler</string>
     <string name="ok">Valider</string>
     <string name="dialog_stationconflict_title">Choisir une station</string>
+    <string name="fragment_homepage_bookmarks">Favoris</string>
 
     <string-array name="spinner_dep_arr">
         <item>Partir</item>
