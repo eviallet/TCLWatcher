@@ -14,6 +14,9 @@ interface BookmarkDao {
     @Insert
     fun insertAll(bookmarks: List<Bookmark>)
 
+    @Update
+    fun update(bookmark: Bookmark)
+
     @Delete
     fun delete(bookmark: Bookmark)
 }

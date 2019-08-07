@@ -68,12 +68,69 @@
 
                 android:orientation="vertical"
                 android:animateLayoutChanges="true">
-            <android.support.v7.widget.RecyclerView
-                    android:id="@+id/row_bookmark_recyclerview"
+            <LinearLayout
+                    android:id="@+id/row_bookmark_recyclerview1_container"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="3dp"
+                    android:weightSum="5"
+                    android:visibility="gone">
+                <TextView
+                        android:id="@+id/row_bookmark_recyclerview1_depart"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
 
-                    android:visibility="gone"/>
+                        android:textColor="@android:color/black"
+                        android:layout_weight="1"/>
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/row_bookmark_recyclerview_1"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
+
+                        android:layout_weight="3"/>
+                <TextView
+                        android:id="@+id/row_bookmark_recyclerview1_arrival"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
+
+                        android:textColor="@android:color/black"
+                        android:layout_weight="1"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/row_bookmark_recyclerview2_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:weightSum="5"
+                    android:visibility="gone">
+                <TextView
+                        android:id="@+id/row_bookmark_recyclerview2_depart"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
+
+                        android:textColor="@android:color/black"
+
+                        android:layout_weight="1"/>
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/row_bookmark_recyclerview_2"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
+
+                        android:layout_weight="3"/>
+                <TextView
+                        android:id="@+id/row_bookmark_recyclerview2_arrival"
+                        android:layout_width="0dp"
+                        android:layout_height="22dp"
+
+                        android:textColor="@android:color/black"
+
+                        android:layout_weight="1"/>
+            </LinearLayout>
             <LinearLayout
                     android:id="@+id/row_bookmark_expand"
                     android:layout_width="match_parent"
@@ -111,6 +168,34 @@
                             android:scaleType="fitXY"
 
                             android:layout_marginStart="15dp"
+                            android:layout_centerVertical="true"/>
+                    <ImageButton
+                            android:id="@+id/row_bookmark_movedown"
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_arrow_down"
+                            android:tint="@android:color/darker_gray"
+                            android:visibility="gone"
+                            android:scaleType="fitXY"
+
+                            android:layout_marginEnd="15dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"/>
+                    <ImageButton
+                            android:id="@+id/row_bookmark_moveup"
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_arrow_up"
+                            android:tint="@android:color/darker_gray"
+                            android:visibility="gone"
+                            android:scaleType="fitXY"
+
+                            android:layout_marginEnd="35dp"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"/>
                 </RelativeLayout>
             </LinearLayout>

@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import com.gueg.tclwatcher.R
-import com.gueg.tclwatcher.VerticalItemDecoration
+import com.gueg.tclwatcher.OrientedItemDecoration
 
 
 class RouteFragment : Fragment() {
@@ -60,7 +60,7 @@ class RouteFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = SubRouteAdapter(route, routeFragmentListener)
         recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(VerticalItemDecoration(30))
+        recyclerView.addItemDecoration(OrientedItemDecoration(30))
 
         recyclerView.overScrollMode = OVER_SCROLL_NEVER
 

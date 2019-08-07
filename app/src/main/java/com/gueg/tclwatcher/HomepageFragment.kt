@@ -80,23 +80,31 @@ class HomepageFragment : Fragment() {
         bookmarkRecyclerView = rootView.findViewById(R.id.fragment_homepage_recyclerview)
         bookmarkRecyclerView.setHasFixedSize(true)
         bookmarkRecyclerView.layoutManager = LinearLayoutManager(context)
-        bookmarkAdapter = BookmarkAdapter(context!!, object: BookmarkSelectedListener {
-            override fun onBookmarkSelected(bookmark: Bookmark) {
-                stationPicker.fill(bookmark.from, bookmark.to)
-                if(bookmark.hasBeenRefined()) {
-                    stationPicker.refinedFrom = bookmark.refinedFrom
-                    stationPicker.refinedTo = bookmark.refinedTo
+        bookmarkAdapter = BookmarkAdapter(
+            activity!!,
+            bookmarkRecyclerView,
+            object: BookmarkSelectedListener {
+                override fun onBookmarkSelected(bookmark: Bookmark) {
+                    stationPicker.fill(bookmark.from, bookmark.to)
+                    if(bookmark.hasBeenRefined()) {
+                        stationPicker.refinedFrom = bookmark.refinedFrom
+                        stationPicker.refinedTo = bookmark.refinedTo
+                    }
+                }
+
+                override fun onBookmarkDeleted(bookmark: Bookmark) {
+                    askBookmarkDeletion(bookmark)
                 }
             }
-
-            override fun onBookmarkDeleted(bookmark: Bookmark) {
-                askBookmarkDeletion(bookmark)
-            }
-        })
+        )
         bookmarkRecyclerView.adapter = bookmarkAdapter
-        bookmarkRecyclerView.addItemDecoration(VerticalItemDecoration(30))
+        bookmarkRecyclerView.addItemDecoration(OrientedItemDecoration(30))
 
         bookmarkRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+
+        rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_refresh).setOnClickListener {
+            bookmarkAdapter.refresh()
+        }
 
         return rootView
     }
