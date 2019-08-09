@@ -3,7 +3,6 @@ package com.gueg.tclwatcher.bookmarks
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -109,6 +108,8 @@ class BookmarkAdapter internal constructor(
             }
             bookmarks.removeAt(index)
             bookmarks.add(index, bookmark)
+
+            refresh(index)
         }
 
         holder.delete.setOnClickListener { bookmarkSelectedListener.onBookmarkDeleted(bookmark) }
@@ -124,7 +125,6 @@ class BookmarkAdapter internal constructor(
             bookmarks.add(pos-1, from)
             bookmarks.add(pos, dest)
             notifyItemMoved(pos, pos-1)
-            Log.d(":-:","moving : $pos -> ${pos-1}")
             refreshMoveArrows(pos-1)
             refreshMoveArrows(pos)
 
@@ -145,7 +145,6 @@ class BookmarkAdapter internal constructor(
             bookmarks.add(pos, dest)
             bookmarks.add(pos, from)
             notifyItemMoved(pos, pos+1)
-            Log.d(":-:","moving : $pos -> ${pos+1}")
             refreshMoveArrows(pos)
             refreshMoveArrows(pos+1)
 
@@ -164,29 +163,7 @@ class BookmarkAdapter internal constructor(
                 holder.movedown.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { holder.movedown.visibility = GONE }
             } else {
                 if(holder.isFirstExpanding) {
-                    holder.recyclerView1.setHasFixedSize(true)
-                    holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
-                    holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-                    holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
-                    holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextUrl: String ->
-                        activity.runOnUiThread {
-                            holder.recyclerView2.setHasFixedSize(true)
-                            holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
-                            holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-                            holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
-                            holder.recyclerView2.adapter = BookmarkRouteAdapter(activity, bookmark, nextUrl = nextUrl, onTimesGot = { depart, arrival ->
-                                activity.runOnUiThread {
-                                    holder.depart2.text = depart
-                                    holder.arrival2.text = arrival
-                                }
-                            })
-                        }
-                    }, onTimesGot = { depart, arrival ->
-                        activity.runOnUiThread {
-                            holder.depart1.text = depart
-                            holder.arrival1.text = arrival
-                        }
-                    })
+                    setRecyclerViews(holder, bookmark)
                     holder.isFirstExpanding = false
                 }
 
@@ -231,10 +208,47 @@ class BookmarkAdapter internal constructor(
         }
     }
 
-    fun refresh() {
-        for(i in 0..bookmarks.lastIndex)
-            viewAt(i)?.isFirstExpanding = true
-        notifyDataSetChanged()
+    fun refresh(pos: Int = -1) {
+        if(pos != -1) {
+            setRecyclerViews(viewAt(pos)!!, bookmarks[pos])
+        } else {
+            for(i in 0..bookmarks.lastIndex) {
+                if(viewAt(i)!=null) {
+                    if(viewAt(i)!!.isExpanded)
+                        setRecyclerViews(viewAt(i)!!, bookmarks[i])
+                    else
+                        viewAt(i)!!.isFirstExpanding = true
+                }
+            }
+            notifyDataSetChanged()
+        }
+    }
+
+    private fun setRecyclerViews(holder: ViewHolder, bookmark: Bookmark) {
+        holder.recyclerView1.setHasFixedSize(true)
+        holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
+        holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+        holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextUrl: String ->
+            activity.runOnUiThread {
+                holder.recyclerView2.setHasFixedSize(true)
+                holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
+                holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+                holder.recyclerView2.adapter = BookmarkRouteAdapter(activity, bookmark, nextUrl = nextUrl, onTimesGot = { depart, arrival ->
+                    activity.runOnUiThread {
+                        holder.depart2.text = depart
+                        holder.arrival2.text = arrival
+                    }
+                })
+            }
+        }, onTimesGot = { depart, arrival ->
+            activity.runOnUiThread {
+                holder.depart1.text = depart
+                holder.arrival1.text = arrival
+            }
+        })
+
     }
 
     private fun refreshMoveArrows(position: Int) {
