@@ -116,8 +116,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         fab = findViewById(R.id.view_stationpicker_fab)
         fab.setOnClickListener {
-            setLoading(true)
             if(checkText()) {
+                setLoading(true)
                 val request = Request(
                     from = from.text.toString(),
                     to = to.text.toString(),
