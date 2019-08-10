@@ -7,11 +7,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.VerticalDividerItemDecoration
+import kotlin.math.hypot
 
 
 class RouteFragment : Fragment() {
@@ -25,6 +27,9 @@ class RouteFragment : Fragment() {
     }
 
     private lateinit var rootView: View
+    private var rootViewFirstShown = true
+    private var shoudAnimateReveal = false
+
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var departAt: TextView
@@ -64,6 +69,16 @@ class RouteFragment : Fragment() {
 
         recyclerView.overScrollMode = OVER_SCROLL_NEVER
 
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            if(rootView.isAttachedToWindow && rootViewFirstShown && shoudAnimateReveal) {
+                val cx = rootView.width / 2
+                val cy = rootView.height / 2
+                val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
+                ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius).setDuration(500).start()
+                rootViewFirstShown = false
+            }
+        }
+
         return rootView
     }
 
@@ -71,6 +86,11 @@ class RouteFragment : Fragment() {
 
     fun with(routeFragmentListener: RouteFragmentListener): RouteFragment {
         this.routeFragmentListener = routeFragmentListener
+        return this
+    }
+
+    fun shouldAnimate(bool: Boolean): RouteFragment {
+        shoudAnimateReveal = bool
         return this
     }
 

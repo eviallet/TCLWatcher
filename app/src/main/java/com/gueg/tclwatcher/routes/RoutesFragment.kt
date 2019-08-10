@@ -132,7 +132,7 @@ class RoutesFragment: Fragment() {
         }
 
         override fun getCount() = routes.size
-        override fun getItem(p0: Int) = RouteFragment.from(routes[p0]).with(routeFragmentListener)
+        override fun getItem(p0: Int) = RouteFragment.from(routes[p0]).with(routeFragmentListener).shouldAnimate(routes[p0] == route)
     }
 
 }
