@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import com.gueg.tclwatcher.R
-import com.gueg.tclwatcher.OrientedItemDecoration
+import com.gueg.tclwatcher.VerticalDividerItemDecoration
 
 
 class RouteFragment : Fragment() {
@@ -60,17 +60,14 @@ class RouteFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = SubRouteAdapter(route, routeFragmentListener)
         recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(OrientedItemDecoration(30))
+        recyclerView.addItemDecoration(VerticalDividerItemDecoration(context!!, 15))
 
         recyclerView.overScrollMode = OVER_SCROLL_NEVER
 
         return rootView
     }
 
-    private fun addLeadingZero(date: String): String {
-        return if(date.toInt() < 10) "0$date"
-        else date
-    }
+    private fun addLeadingZero(date: String) = if(date.toInt() < 10) "0$date" else date
 
     fun with(routeFragmentListener: RouteFragmentListener): RouteFragment {
         this.routeFragmentListener = routeFragmentListener

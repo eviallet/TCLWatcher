@@ -1,125 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/row_subroute_container"
-        android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row_subroute_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+
+    android:layout_marginStart="3dp"
+    android:layout_marginEnd="3dp">
+<LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-
-        android:layout_marginStart="3dp"
-        android:layout_marginEnd="3dp">
+        android:orientation="vertical">
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-        <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-            <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
 
-                    android:layout_marginTop="2dp"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp">
-                <ImageView
-                        android:id="@+id/row_subroute_pic"
-                        android:layout_width="40dp"
-                        android:layout_height="20dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp">
+        <ImageView
+                android:id="@+id/row_subroute_pic"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
 
-                        android:visibility="gone"
-                        android:scaleType="fitCenter"
+                android:visibility="gone"
+                android:scaleType="fitCenter"
 
-                        android:layout_gravity="center_horizontal"/>
-                <ImageView
-                        android:id="@+id/row_subroute_picleft"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:scaleType="fitXY"
+                android:layout_gravity="center_horizontal"/>
+        <ImageView
+                android:id="@+id/row_subroute_picleft"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
 
-                        android:padding="1dp"/>
-                <ImageView
-                        android:id="@+id/row_subroute_picright"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:scaleType="fitXY"
+                android:padding="1dp"/>
+        <ImageView
+                android:id="@+id/row_subroute_picright"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
 
-                        android:padding="1dp"/>
-            </LinearLayout>
-            <TextView
-                    android:id="@+id/row_subroute_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:textColor="@color/timeColor"
-                    android:textSize="12sp"
-
-                    android:layout_gravity="center_horizontal"/>
-        </LinearLayout>
-
-        <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-            <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                <TextView
-                        android:id="@+id/row_subroute_departat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:textColor="@color/timeColor"
-                        android:textSize="13sp"
-
-                        android:layout_marginTop="1dp"
-                        android:layout_marginEnd="5dp"/>
-                <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                    <TextView
-                            android:id="@+id/row_subroute_from"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:textStyle="bold"/>
-                    <TextView
-                            android:id="@+id/row_subroute_fromdir"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:textSize="12sp"/>
-                </LinearLayout>
-            </LinearLayout>
-            <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                <TextView
-                        android:id="@+id/row_subroute_arriveat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:textColor="@color/timeColor"
-                        android:textSize="13sp"
-
-                        android:layout_marginEnd="5dp"/>
-                <TextView
-                        android:id="@+id/row_subroute_to"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:textStyle="bold"/>
-            </LinearLayout>
-        </LinearLayout>
-
+                android:padding="1dp"/>
     </LinearLayout>
-</android.support.v7.widget.CardView>
+    <TextView
+            android:id="@+id/row_subroute_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textColor="@color/timeColor"
+            android:textSize="12sp"
+
+            android:layout_gravity="center_horizontal"/>
+</LinearLayout>
+
+<LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView
+                android:id="@+id/row_subroute_departat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textColor="@color/timeColor"
+                android:textSize="13sp"
+
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="5dp"/>
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <TextView
+                    android:id="@+id/row_subroute_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:textStyle="bold"/>
+            <TextView
+                    android:id="@+id/row_subroute_fromdir"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView
+                android:id="@+id/row_subroute_arriveat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textColor="@color/timeColor"
+                android:textSize="13sp"
+
+                android:layout_marginEnd="5dp"/>
+        <TextView
+                android:id="@+id/row_subroute_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textStyle="bold"/>
+    </LinearLayout>
+</LinearLayout>
+
+</LinearLayout>
