@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
 
                     android:singleLine="true"
-                    android:inputType="textAutoComplete"
+                    android:inputType="textAutoComplete|textNoSuggestions"
                     android:imeOptions="actionNext"
                     android:textSize="15sp"
 
@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
 
                     android:singleLine="true"
-                    android:inputType="textAutoComplete"
+                    android:inputType="textAutoComplete|textNoSuggestions"
                     android:imeOptions="actionDone"
                     android:textSize="15sp"
 

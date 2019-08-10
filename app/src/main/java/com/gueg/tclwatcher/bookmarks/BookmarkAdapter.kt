@@ -1,6 +1,7 @@
 package com.gueg.tclwatcher.bookmarks
 
 import android.app.Activity
+import android.support.transition.TransitionManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -155,6 +156,7 @@ class BookmarkAdapter internal constructor(
         }
 
         holder.expand.setOnClickListener {
+            TransitionManager.beginDelayedTransition(recyclerView)
             if(holder.isExpanded) {
                 holder.container1.visibility = GONE
                 holder.container2.visibility = GONE
