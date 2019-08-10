@@ -260,19 +260,18 @@ class BookmarkAdapter internal constructor(
         if(!holder.isExpanded)
             return
 
-        when(position) {
-            0 -> holder.moveup.visibility = GONE
-            bookmarks.lastIndex -> holder.movedown.visibility = GONE
-            else -> {
-                if(holder.moveup.visibility != VISIBLE) {
-                    holder.moveup.visibility = VISIBLE
-                    holder.moveup.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                }
-                if(holder.movedown.visibility != VISIBLE) {
-                    holder.movedown.visibility = VISIBLE
-                    holder.movedown.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                }
-            }
+        if(position==0)
+            holder.moveup.visibility = GONE
+        else if(holder.moveup.visibility != VISIBLE) {
+            holder.moveup.visibility = VISIBLE
+            holder.moveup.animate().alpha(1f).scaleX(1f).scaleY(1f)
+        }
+
+        if(position==bookmarks.lastIndex)
+            holder.movedown.visibility = GONE
+        else if(holder.movedown.visibility != VISIBLE) {
+            holder.movedown.visibility = VISIBLE
+            holder.movedown.animate().alpha(1f).scaleX(1f).scaleY(1f)
         }
 
     }
