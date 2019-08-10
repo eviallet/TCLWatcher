@@ -153,11 +153,27 @@
                 android:background="@android:color/darker_gray"
 
                 android:layout_marginTop="2dp"/>
-        <android.support.v7.widget.RecyclerView
-                android:id="@+id/fragment_route_recyclerview"
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 
-                android:padding="7dp"/>
+                android:padding="7dp">
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/fragment_route_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            <ImageView
+                    android:id="@+id/fragment_route_recyclerview_indicator"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+
+                    android:src="@drawable/ic_indicator"
+                    android:tint="@color/colorPrimary"
+                    android:visibility="invisible"
+
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

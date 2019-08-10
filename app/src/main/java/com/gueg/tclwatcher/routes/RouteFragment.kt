@@ -6,10 +6,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OVER_SCROLL_NEVER
+import android.view.View.*
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.VerticalDividerItemDecoration
@@ -37,6 +38,8 @@ class RouteFragment : Fragment() {
     private lateinit var duration: TextView
     private lateinit var date: TextView
 
+    private lateinit var indicator: ImageView
+
     private lateinit var adapter: SubRouteAdapter
     lateinit var route: Route
 
@@ -57,15 +60,31 @@ class RouteFragment : Fragment() {
         @Suppress("LocalVariableName") val day_mon = addLeadingZero(mon_day[1]) + "/" + addLeadingZero(mon_day[0])
         date.text = day_mon
 
+        indicator = rootView.findViewById(R.id.fragment_route_recyclerview_indicator)
+
         rootView.findViewById<ImageButton>(R.id.fragment_route_share).setOnClickListener { routeFragmentListener.onShare(route) }
         rootView.findViewById<ImageButton>(R.id.fragment_route_map).setOnClickListener { routeFragmentListener.onRouteMap(route) }
         rootView.findViewById<ImageButton>(R.id.fragment_route_bookmark).setOnClickListener { routeFragmentListener.onBookmark(route) }
+
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = SubRouteAdapter(route, routeFragmentListener)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(VerticalDividerItemDecoration(context!!, 15))
+
+        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                if(layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount-1)
+                    indicator.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { indicator.visibility = GONE }
+                else if(indicator.visibility != VISIBLE) {
+                    indicator.visibility = VISIBLE
+                    indicator.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                }
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
 
         recyclerView.overScrollMode = OVER_SCROLL_NEVER
 
