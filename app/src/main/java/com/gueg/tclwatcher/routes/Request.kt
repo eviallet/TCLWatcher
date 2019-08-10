@@ -43,7 +43,7 @@ class Request(
         if(hasBeenRefined) refinedString()
         else regularString()
 
-    fun regularString() = LINK
+    private fun regularString() = LINK
         .replace("#DEP#", URLEncoder.encode(from, "UTF-8") + "+%28Arret%29")
         .replace("#ARR#", URLEncoder.encode(to, "UTF-8") + "+%28Arret%29")
         .replace("#DEPARR#", if(timeMode == TimeMode.DEPART_AT) "HorPartir" else "HorArriver")
@@ -53,7 +53,7 @@ class Request(
         .replace("#HOUR#", hour.toString())
         .replace("#MIN#", minute.toString())
 
-    fun refinedString() = REFINED_LINK
+    private fun refinedString() = REFINED_LINK
         .replace("#DEP#", URLEncoder.encode(from, "UTF-8"))
         .replace("#ARR#", URLEncoder.encode(to, "UTF-8"))
         .replace("#DEPARR#", if(timeMode == TimeMode.DEPART_AT) "HorPartir" else "HorArriver")

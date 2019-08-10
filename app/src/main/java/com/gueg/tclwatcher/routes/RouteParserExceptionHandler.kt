@@ -11,7 +11,9 @@ class RouteParserExceptionHandler(private val activity: MainActivity, private va
 
     override fun uncaughtException(thread: Thread?, throwable: Throwable?) {
         activity.runOnUiThread {
-            Log.d(":-:",throwable!!.javaClass.name)
+            Log.w(":-:",throwable!!.javaClass.name)
+            Log.w(":-:"," -> ${throwable.message}")
+            for(a in throwable.stackTrace) Log.w(":-:", "\t$a")
             when (throwable) {
                 is RouteParser.ParseError -> activity.setError(throwable.message.toString().split(".")[0].plus("."))
                 is RouteParser.StationConflictError -> { // if there was any conflict

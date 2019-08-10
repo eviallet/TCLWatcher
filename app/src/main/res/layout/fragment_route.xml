@@ -132,17 +132,6 @@
                         android:tint="@color/homepageButtonsColor"
 
                         android:layout_marginEnd="20dp"/>
-                <ImageButton
-                        android:id="@+id/fragment_route_bookmark"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-
-                        android:src="@drawable/ic_bookmark_border"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:scaleType="fitXY"
-                        android:tint="@color/homepageButtonsColor"
-
-                        android:layout_marginEnd="10dp"/>
             </LinearLayout>
 
         </RelativeLayout>

@@ -27,7 +27,7 @@ import com.gueg.tclwatcher.stations.StationPicker
 class HomepageFragment : Fragment() {
 
     private lateinit var rootView: ViewGroup
-    private lateinit var stationPicker: StationPicker
+    lateinit var stationPicker: StationPicker
 
     private lateinit var bookmarkRecyclerView: RecyclerView
     private lateinit var bookmarkAdapter: BookmarkAdapter
@@ -41,6 +41,9 @@ class HomepageFragment : Fragment() {
             field = value
         }
 
+    var tempFrom = ""
+    var tempTo = ""
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView = inflater.inflate(R.layout.fragment_homepage, container, false) as ViewGroup
@@ -50,6 +53,9 @@ class HomepageFragment : Fragment() {
         stationPicker.listener = stationPickerListener
         if(tempStationPickerData != null)
             stationPicker.initFrom(tempStationPickerData!!)
+        else if(tempFrom.isNotEmpty()) {
+            stationPicker.fillNow(tempFrom, tempTo)
+        }
 
         rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_map).setOnClickListener {
             activity!!.startActivity(Intent(activity, MapActivity::class.java))

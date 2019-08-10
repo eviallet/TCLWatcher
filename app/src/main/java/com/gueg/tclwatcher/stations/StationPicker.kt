@@ -246,6 +246,11 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         }.start()
     }
 
+    fun fillNow(from: String, to: String) {
+        this.from.setText(from)
+        this.to.setText(to)
+    }
+
     private inner class CharacterAnimator(val view: EditText, val text: String, val delay: Long = 4, val onFinish: () -> Unit = {}) : Runnable {
         private var index = 0
         private val handler = Handler()

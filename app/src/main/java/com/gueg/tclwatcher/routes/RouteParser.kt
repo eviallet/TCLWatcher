@@ -46,7 +46,8 @@ class RouteParser {
                 val route = Route(
                     from = request.from, to = request.to,
                     departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength, date = date,
-                    prev = prev, next = next
+                    prev = prev, next = next,
+                    request = finalUrl
                 )
 
                 val rows: Elements

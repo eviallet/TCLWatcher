@@ -62,9 +62,8 @@ class RouteFragment : Fragment() {
 
         indicator = rootView.findViewById(R.id.fragment_route_recyclerview_indicator)
 
-        rootView.findViewById<ImageButton>(R.id.fragment_route_share).setOnClickListener { routeFragmentListener.onShare(route) }
+        rootView.findViewById<ImageButton>(R.id.fragment_route_share).setOnClickListener { routeFragmentListener.onShare(route.request) }
         rootView.findViewById<ImageButton>(R.id.fragment_route_map).setOnClickListener { routeFragmentListener.onRouteMap(route) }
-        rootView.findViewById<ImageButton>(R.id.fragment_route_bookmark).setOnClickListener { routeFragmentListener.onBookmark(route) }
 
 
         recyclerView.setHasFixedSize(true)
@@ -116,8 +115,7 @@ class RouteFragment : Fragment() {
     interface RouteFragmentListener {
         fun onStationMap(nameFrom: String, nameTo: String)
         fun onRouteMap(route: Route)
-        fun onBookmark(route: Route)
-        fun onShare(route: Route)
+        fun onShare(request: String)
     }
 
 }

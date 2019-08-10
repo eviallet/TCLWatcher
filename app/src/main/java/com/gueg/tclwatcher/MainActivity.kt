@@ -30,6 +30,48 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private var homepageFragment = HomepageFragment()
     private var currentFragment: Fragment ?= null
 
+    private var pendingRequest: String ?= null
+
+    // ======= LISTENERS =======
+
+    private val routeFragmentListener = object: RouteFragment.RouteFragmentListener {
+        override fun onStationMap(nameFrom: String, nameTo: String) {
+            val intent = Intent(applicationContext, MapActivity::class.java)
+            intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
+            intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
+            startActivity(intent)
+        }
+        override fun onRouteMap(route: Route) {
+            val intent = Intent(applicationContext, MapActivity::class.java)
+            val stringArrayList = ArrayList<String>()
+            for (subroute in route.get()) {
+                if (subroute is Route.TCL) {
+                    stringArrayList.add(subroute.from)
+                    stringArrayList.add(subroute.to)
+                }
+            }
+            startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
+        }
+        override fun onShare(request: String) {
+            val i = Intent(Intent.ACTION_SEND)
+            i.type = "text/plain"
+            i.putExtra(Intent.EXTRA_SUBJECT, "Partager")
+            i.putExtra(Intent.EXTRA_TEXT, request)
+            startActivity(Intent.createChooser(i, "Partager avec"))
+        }
+    }
+
+    private val routeParserListener = object: RouteParser.RouteParserListener {
+        override fun onRouteParsed(route: Route) {
+            val routesFragment = RoutesFragment()
+            routesFragment.route = route
+            routesFragment.routeFragmentListener = routeFragmentListener
+            setFragment(routesFragment)
+        }
+    }
+
+    // ======= ACTIVITY =======
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -43,6 +85,12 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         setFragment(loadingFragment)
 
         loadStations()
+
+        if (intent.data != null) {
+            val intentUrl = intent.data!!.toString()
+            if (intentUrl.contains("/navitia/itineraire_mobile?") || intentUrl.contains("/navitia/itineraire_mobile?"))
+                pendingRequest = intentUrl
+        }
     }
 
     private fun loadStations() {
@@ -57,42 +105,39 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             runOnUiThread {
                 homepageFragment.setStations(stations)
                 setFragment(homepageFragment)
+
+                if(pendingRequest != null)
+                    onExternalUrlOpened(pendingRequest!!)
             }
         }).start()
     }
 
     override fun onRequestEmitted(request: Request) {
         RouteParser.cancel()
-        RouteParser.parseRoute(request, object : RouteParser.RouteParserListener {
+        RouteParser.parseRoute(request, routeParserListener, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request))
+    }
+
+    private fun onExternalUrlOpened(url: String) {
+        val request = Request("","")
+        RouteParser.cancel()
+        RouteParser.parseRoute(request, object: RouteParser.RouteParserListener {
             override fun onRouteParsed(route: Route) {
-                val routesFragment = RoutesFragment()
-                routesFragment.route = route
-                routesFragment.routeFragmentListener = object: RouteFragment.RouteFragmentListener {
-                    override fun onStationMap(nameFrom: String, nameTo: String) {
-                        val intent = Intent(applicationContext, MapActivity::class.java)
-                        intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
-                        intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
-                        startActivity(intent)
-                    }
-                    override fun onRouteMap(route: Route) {
-                        val intent = Intent(applicationContext, MapActivity::class.java)
-                        val stringArrayList = ArrayList<String>()
-                        for (subroute in route.get()) {
-                            if (subroute is Route.TCL) {
-                                stringArrayList.add(subroute.from)
-                                stringArrayList.add(subroute.to)
-                            }
+                try {
+                    runOnUiThread {
+                        if(currentFragment is HomepageFragment)
+                            (currentFragment as HomepageFragment).stationPicker.fillNow(route.get()[0].from, route.get()[route.get().lastIndex].to)
+                        else {
+                            homepageFragment.stationPicker.fillNow(route.get()[0].from, route.get()[route.get().lastIndex].to)
+                            (currentFragment as RoutesFragment).tempStationPickerData = homepageFragment.stationPicker
                         }
-                        startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
                     }
-                    override fun onBookmark(route: Route) {
-                    }
-                    override fun onShare(route: Route) {
-                    }
+                } catch(err: UninitializedPropertyAccessException) {
+                    (currentFragment as HomepageFragment).tempFrom = route.get()[0].from
+                    (currentFragment as HomepageFragment).tempTo = route.get()[route.get().lastIndex].to
                 }
-                setFragment(routesFragment)
+                routeParserListener.onRouteParsed(route)
             }
-        }, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request))
+        }, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request), url = url)
     }
 
     private fun setFragment(fragment: Fragment) {
