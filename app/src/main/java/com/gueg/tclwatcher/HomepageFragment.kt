@@ -164,6 +164,11 @@ class HomepageFragment : Fragment() {
             .show()
     }
 
+    override fun onPause() {
+        stationPicker.onPause()
+        super.onPause()
+    }
+
     interface BookmarkSelectedListener {
         fun onBookmarkSelected(bookmark: Bookmark)
         fun onBookmarkDeleted(bookmark: Bookmark)

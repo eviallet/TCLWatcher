@@ -41,6 +41,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     var refinedFrom: String ?= null
     var refinedTo: String ?= null
 
+    private var firstDateNotification = true
+
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
 
@@ -74,6 +76,11 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         dateSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                if(firstDateNotification) {
+                    firstDateNotification = false
+                    return
+                }
+
                 if(position==2) {
                     val pickerDialog = DatePickerDialog(
                         context, DatePickerDialog.OnDateSetListener { _, y, month, day ->
@@ -319,6 +326,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         from.setAdapter(adapter)
         to.setAdapter(adapter)
+    }
+
+    fun onPause() {
+        dateSpinner.setSelection(0)
     }
 
     interface StationPickerListener {
