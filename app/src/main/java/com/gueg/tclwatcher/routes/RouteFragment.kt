@@ -75,11 +75,16 @@ class RouteFragment : Fragment() {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if(layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount-1)
-                    indicator.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { indicator.visibility = GONE }
-                else if(indicator.visibility != VISIBLE) {
-                    indicator.visibility = VISIBLE
-                    indicator.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                val view = recyclerView.getChildAt(recyclerView.childCount-1)
+                if(view != null) {
+                    if (!layoutManager.isViewPartiallyVisible(view, false, false))
+                        indicator.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction {
+                            indicator.visibility = GONE
+                        }
+                    else if (indicator.visibility != VISIBLE) {
+                        indicator.visibility = VISIBLE
+                        indicator.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                    }
                 }
                 super.onScrolled(recyclerView, dx, dy)
             }
