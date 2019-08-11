@@ -133,6 +133,10 @@ class RouteParser {
                     }
                 }
 
+                val warningElement = page.select(".INFORMATIONS-IMPORTANTES")
+                if(warningElement.size > 0)
+                    route.warning = warningElement.first().select(".texte-infos-importantes").first().text()
+
                 routeParserListener.onRouteParsed(route)
 
                 threads.remove(Thread.currentThread())

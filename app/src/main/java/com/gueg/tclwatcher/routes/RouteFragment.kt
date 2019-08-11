@@ -2,6 +2,7 @@ package com.gueg.tclwatcher.routes
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -39,6 +40,7 @@ class RouteFragment : Fragment() {
     private lateinit var date: TextView
 
     private lateinit var indicator: ImageView
+    private lateinit var warning: ImageButton
 
     private lateinit var adapter: SubRouteAdapter
     lateinit var route: Route
@@ -65,6 +67,16 @@ class RouteFragment : Fragment() {
         rootView.findViewById<ImageButton>(R.id.fragment_route_share).setOnClickListener { routeFragmentListener.onShare(route.request) }
         rootView.findViewById<ImageButton>(R.id.fragment_route_map).setOnClickListener { routeFragmentListener.onRouteMap(route) }
 
+        warning = rootView.findViewById(R.id.fragment_route_warning)
+        if(route.warning.isNotEmpty()) {
+            warning.visibility = VISIBLE
+            warning.setOnClickListener {
+                AlertDialog.Builder(context!!)
+                    .setMessage(route.warning)
+                    .create()
+                    .show()
+            }
+        }
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
