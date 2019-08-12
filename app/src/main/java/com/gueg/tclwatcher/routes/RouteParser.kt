@@ -32,7 +32,7 @@ class RouteParser {
                 }
 
                 Log.d(":-:$TAG", finalUrl)
-                val page = Jsoup.connect(finalUrl).get()
+                val page = Jsoup.connect(finalUrl).get() ?: throw ParseError("Une erreur est survenue.")
 
                 val date = page.select("input[name=selectedDate]").first().attr("value").toString() // 2019|7|31
 

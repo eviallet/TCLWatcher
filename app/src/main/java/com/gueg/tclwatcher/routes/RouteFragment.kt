@@ -71,15 +71,16 @@ class RouteFragment : Fragment() {
         if(route.warning.isNotEmpty()) {
             warning.visibility = VISIBLE
             warning.setOnClickListener {
-                AlertDialog.Builder(context!!)
-                    .setMessage(route.warning)
+                val dialog = AlertDialog.Builder(context!!)
+                    .setView(R.layout.dialog_warning)
                     .create()
-                    .show()
+                dialog.show()
+                dialog.findViewById<TextView>(R.id.dialog_warning_text)!!.text = route.warning
             }
         }
 
         recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = LinearLayoutManager(context)!!
         adapter = SubRouteAdapter(route, routeFragmentListener)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(VerticalDividerItemDecoration(context!!, 15))
