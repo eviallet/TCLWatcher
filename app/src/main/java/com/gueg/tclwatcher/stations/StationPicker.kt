@@ -145,7 +145,7 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         from.setOnEditorActionListener { _, actionId, _ ->
             if(actionId == EditorInfo.IME_ACTION_NEXT)
-                to.requestFocus()
+                to.performClick()
             false
         }
         to.setOnEditorActionListener { _, actionId, _ ->
@@ -153,6 +153,26 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 fab.performClick()
             false
         }
+
+        from.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                if(p0==null) return
+                if(p0.length < 2 && refinedFrom != null)
+                    refinedFrom = null
+            }
+        })
+
+        to.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                if(p0==null) return
+                if(p0.length < 2 && refinedTo != null)
+                    refinedTo = null
+            }
+        })
 
         swap = findViewById(R.id.view_stationpicker_swap)
         swap.setOnClickListener {
