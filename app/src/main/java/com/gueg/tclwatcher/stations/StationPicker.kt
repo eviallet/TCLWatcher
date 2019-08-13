@@ -155,22 +155,41 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         }
 
         from.addTextChangedListener(object: TextWatcher {
+            var oldLength = 0
             override fun afterTextChanged(p0: Editable?) {}
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(p0==null) return
-                if(p0.length < 2 && refinedFrom != null)
+            override fun onTextChanged(s: CharSequence?, p1: Int, before: Int, p3: Int) {
+                if(s==null) return
+                if(s.isNotEmpty())
+                    from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                if(s.length < oldLength && refinedFrom != null) {
                     refinedFrom = null
+                    refinedTo = null
+                }
+                oldLength = s.length
             }
         })
 
         to.addTextChangedListener(object: TextWatcher {
+            var oldLength = 0
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(s: CharSequence?, p1: Int, before: Int, p3: Int) {
+                if(s==null) return
+                if(s.isNotEmpty())
+                    to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                if(s.length < oldLength && refinedTo != null) {
+                    refinedFrom = null
+                    refinedTo = null
+                }
+                oldLength = s.length
+            }
+        })
+        to.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(p0: Editable?) {}
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(p0==null) return
-                if(p0.length < 2 && refinedTo != null)
-                    refinedTo = null
+                if (p0 == null) return
             }
         })
 
@@ -237,28 +256,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         if(from.text.isEmpty()) {
             isTextNotEmpty = false
             from.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
-            from.addTextChangedListener(object: TextWatcher{
-                override fun afterTextChanged(p0: Editable?) {}
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    if(p0 == null) return
-                    if(p0.isNotEmpty())
-                        from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                }
-            })
         }
         if(to.text.isEmpty()) {
             isTextNotEmpty = false
             to.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_empty_text, 0)
-            to.addTextChangedListener(object: TextWatcher {
-                override fun afterTextChanged(p0: Editable?) {}
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    if (p0 == null) return
-                    if (p0.isNotEmpty())
-                        to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                }
-            })
         }
 
         return isTextNotEmpty
@@ -267,9 +268,14 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun from() = from.text.toString()
     fun to() = to.text.toString()
 
-    fun fill(from: String, to: String) {
+    fun fill(from: String, to: String, refinedFrom: String, refinedTo: String) {
         CharacterAnimator(this.from, from) {
-            CharacterAnimator(this.to, to).start()
+            CharacterAnimator(this.to, to) {
+                if(refinedFrom.isNotEmpty())
+                    this.refinedFrom = refinedFrom
+                if(refinedTo.isNotEmpty())
+                    this.refinedTo = refinedTo
+            }.start()
         }.start()
     }
 

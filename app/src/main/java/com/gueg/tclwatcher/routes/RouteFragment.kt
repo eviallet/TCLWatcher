@@ -45,6 +45,8 @@ class RouteFragment : Fragment() {
     private lateinit var adapter: SubRouteAdapter
     lateinit var route: Route
 
+    lateinit var onAnimated: () -> Unit
+
     lateinit var routeFragmentListener: RouteFragmentListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -102,16 +104,18 @@ class RouteFragment : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
             }
         })
+        indicator.setOnClickListener { recyclerView.smoothScrollToPosition(recyclerView.childCount - 1) }
 
         recyclerView.overScrollMode = OVER_SCROLL_NEVER
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener {
             if(rootView.isAttachedToWindow && rootViewFirstShown && shoudAnimateReveal) {
+                rootViewFirstShown = false
                 val cx = rootView.width / 2
                 val cy = rootView.height / 2
                 val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
                 ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius).setDuration(500).start()
-                rootViewFirstShown = false
+                onAnimated()
             }
         }
 
@@ -125,8 +129,9 @@ class RouteFragment : Fragment() {
         return this
     }
 
-    fun shouldAnimate(bool: Boolean): RouteFragment {
+    fun shouldAnimate(bool: Boolean, onAnimated: () -> Unit): RouteFragment {
         shoudAnimateReveal = bool
+        this.onAnimated = onAnimated
         return this
     }
 

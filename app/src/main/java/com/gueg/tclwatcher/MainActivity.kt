@@ -142,9 +142,11 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private fun setFragment(fragment: Fragment) {
         if((currentFragment is RoutesFragment || currentFragment is HomepageFragment) && (fragment is RoutesFragment || fragment is HomepageFragment)) {
-            fragment.enterTransition = Explode(this, null)
-            fragment.sharedElementEnterTransition = AutoTransition()
-            currentFragment!!.exitTransition = Explode(this, null)
+            if(!(fragment is RoutesFragment && currentFragment is RoutesFragment)) {
+                fragment.enterTransition = Explode(this, null)
+                fragment.sharedElementEnterTransition = AutoTransition()
+                currentFragment!!.exitTransition = Explode(this, null)
+            }
 
             if(fragment is HomepageFragment)
                 fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag("transition_picker")
@@ -181,6 +183,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
             if(currentFragment is HomepageFragment)
                 homepageFragment.onError()
+            else if(currentFragment is RoutesFragment)
+                (currentFragment as RoutesFragment).onError()
         }
     }
 

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,10 +79,15 @@ class RoutesFragment: Fragment() {
         return rootView
     }
 
+    fun onError() {
+        stationPicker.setLoading(false)
+    }
+
     inner class RoutesPagerAdapter(private val activity: Activity, fm: FragmentManager, route: Route) : FragmentStatePagerAdapter(fm) {
 
         private val routes = ArrayList<Route>()
         private val handler = Handler()
+        private var hasBeenAnimated = false
 
         init {
             add(route=route)
@@ -100,6 +106,7 @@ class RoutesFragment: Fragment() {
                     }
                     activity.runOnUiThread {
                         if (pos == PREV) {
+                            Log.d(":-:","refreshing adapter")
                             viewPager.adapter = this
                             viewPager.currentItem = viewPagerPos + 1
                         } else
@@ -132,7 +139,11 @@ class RoutesFragment: Fragment() {
         }
 
         override fun getCount() = routes.size
-        override fun getItem(p0: Int) = RouteFragment.from(routes[p0]).with(routeFragmentListener).shouldAnimate(routes[p0] == route)
+        override fun getItem(p0: Int) = RouteFragment
+            .from(routes[p0])
+            .with(routeFragmentListener)
+            .shouldAnimate(routes[p0] == route && !hasBeenAnimated)
+            { hasBeenAnimated = true }
     }
 
 }

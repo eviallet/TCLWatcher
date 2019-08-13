@@ -91,13 +91,8 @@ class HomepageFragment : Fragment() {
             bookmarkRecyclerView,
             object: BookmarkSelectedListener {
                 override fun onBookmarkSelected(bookmark: Bookmark) {
-                    stationPicker.fill(bookmark.from, bookmark.to)
-                    if(bookmark.hasBeenRefined()) {
-                        stationPicker.refinedFrom = bookmark.refinedFrom
-                        stationPicker.refinedTo = bookmark.refinedTo
-                    }
+                    stationPicker.fill(bookmark.from, bookmark.to, bookmark.refinedFrom, bookmark.refinedTo)
                 }
-
                 override fun onBookmarkDeleted(bookmark: Bookmark) {
                     askBookmarkDeletion(bookmark)
                 }
