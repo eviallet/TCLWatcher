@@ -1,4 +1,4 @@
-<img align="left" src="app/src/main/res/drawable/appicon.png" height="60" width="60">
+<img align="left" src="app/src/main/res/drawable/appicon.png" height="80" width="80">
 
 # TCL Watcher
 
