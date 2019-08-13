@@ -1,8 +1,11 @@
-# TCLWatcher
+<img align="left" src="app/src/main/res/drawable/appicon.png" height="60" width="60">
+
+# TCL Watcher
+
 
 App for [Lyon's subways and bus](http://tcl.fr/) using Jsoup : there is no API that calculate routes from, say, unique station IDs (even if they have one) ; instead, ultra long URLs are used, then meaningful HTML page elements are extracted and shown in the front end.
 
-Download the app : [here](https://github.com/eviallet/TCLWatcher/releases/tag/v1.0.0)
+Download the app : [here](https://github.com/eviallet/TCLWatcher/releases/tag/v1.0.2)
 
 <img src="screenshots/homepage.png" height="350" width="200"> <img src="screenshots/route.png" height="350" width="200"> <img src="screenshots/conflict.png" height="350" width="200"> <img src="screenshots/map.png" height="350" width="200"> 
 
