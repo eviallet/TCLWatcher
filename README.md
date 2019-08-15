@@ -3,7 +3,7 @@
 # TCL Watcher
 
 
-Simple app for [Lyon's subways and bus](http://tcl.fr/) using Jsoup. 
+Simple app for [TCL](http://tcl.fr/), Lyon's subways and bus network.
 
 Features :
 * autocomplete stations names
