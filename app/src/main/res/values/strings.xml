@@ -11,6 +11,8 @@
     <string name="ok">Valider</string>
     <string name="dialog_stationconflict_title">Choisir une station</string>
     <string name="fragment_homepage_bookmarks">Favoris</string>
+    <string name="activity_main_export">Exporter</string>
+    <string name="activity_main_import">Importer</string>
 
     <string-array name="spinner_dep_arr">
         <item>Partir</item>

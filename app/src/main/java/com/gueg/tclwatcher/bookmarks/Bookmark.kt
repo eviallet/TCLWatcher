@@ -11,4 +11,6 @@ data class Bookmark(
     var refinedTo: String = ""
 ) {
     fun hasBeenRefined() = refinedFrom != "" || refinedTo != ""
+
+    override fun toString() = "$from -> $to\n\trank = $rank\n\trefinedFrom = $refinedFrom\n\trefinedTo = $refinedTo"
 }

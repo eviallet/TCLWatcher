@@ -110,7 +110,7 @@ class HomepageFragment : Fragment() {
         return rootView
     }
 
-    private fun addBookmark(bookmark: Bookmark) {
+    fun addBookmark(bookmark: Bookmark) {
         Thread {
             try {
                 BookmarkDatabase.getDatabase(context!!).bookmarkDao().insert(bookmark)
