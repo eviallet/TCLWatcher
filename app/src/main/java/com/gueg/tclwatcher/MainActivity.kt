@@ -311,7 +311,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when (PERMISSION_READ_IMPORT) {
+        when (requestCode) {
             PERMISSION_READ_IMPORT -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     beginImport()
@@ -346,7 +346,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private fun beginImport() {
         val intent = Intent(this, FileChooser::class.java)
         intent.putExtra(Constants.SELECTION_MODE, Constants.SELECTION_MODES.SINGLE_SELECTION.ordinal)
-        intent.putExtra(Constants.ALLOWED_FILE_EXTENSIONS, "tclw")
+        intent.putExtra(Constants.ALLOWED_FILE_EXTENSIONS, "csv")
         startActivityForResult(intent, MENU_ID_IMPORT)
     }
 
@@ -411,7 +411,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     .append(if(item.refinedTo.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.refinedTo)
                     .append(IMPORT_EXPORT_BOOKMARK_LINE_SEP)
 
-            val finalFile = File(file, "TCLWatcher_bkp.tclw")
+            val finalFile = File(file, "TCLWatcher_bkp.csv")
             if(finalFile.exists()) {
                 finalFile.delete()
             }

@@ -4,20 +4,17 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.AsyncTask
-import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import android.util.Log
 import android.widget.Toast
 import org.jsoup.Jsoup
 
 
-class UpdateTask(private val app: Activity, private val userAsked: Boolean) : AsyncTask<Void, Void, Boolean>() {
-
-    private lateinit var mPrefs: SharedPreferences
+class UpdateTask(private val app: Activity, private val userAsked: Boolean) : AsyncTask<Void, Void, String>() {
 
     companion object {
        private const val CURRENT_VERSION_TOKEN = "com.gueg.tclwatcher.updatetask.current_version_token"
@@ -31,27 +28,29 @@ class UpdateTask(private val app: Activity, private val userAsked: Boolean) : As
             return cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
         }
 
-    override fun onPreExecute() {
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(app)
-    }
-
-    override fun doInBackground(vararg voids: Void): Boolean? {
+    override fun doInBackground(vararg voids: Void): String? {
         if (!isConnected) return null
 
-        val latestVersion = Jsoup.connect(GITHUB_RELEASES_LINK).get().title() ?: return null
+        val latestVersionUrl = Jsoup.connect(GITHUB_RELEASES_LINK).followRedirects(true).execute().url().toString()
+        val latestVersionString = latestVersionUrl.subSequence(
+            latestVersionUrl.lastIndexOf("/")+1,
+            latestVersionUrl.length
+        ).toString()
 
-        if(mPrefs.getString(CURRENT_VERSION_TOKEN, "") == "") {
-            mPrefs.edit().putString(CURRENT_VERSION_TOKEN, latestVersion).apply()
-            return false
-        }
+        val currentVersionString = app.packageManager.getPackageInfo(app.packageName, 0).versionName
 
-        return mPrefs.getString(CURRENT_VERSION_TOKEN, "") != latestVersion
+        Log.d(":-:","Current version : $currentVersionString - Latest version : $latestVersionString")
+
+        return if(currentVersionString == latestVersionString) "" else latestVersionString
     }
 
-    override fun onPostExecute(response: Boolean?) {
-        if(response == null) return
+    override fun onPostExecute(response: String?) {
+        if(response == null && userAsked)
+            Toast.makeText(app, "Pas de connexion internet.", Toast.LENGTH_SHORT).show()
+        if(response == null)
+            return
 
-        if(response) {
+        if(response.isNotEmpty()) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_DOWNLOAD))
             val pendingIntent = PendingIntent.getActivity(app, 0, intent, 0)
 
