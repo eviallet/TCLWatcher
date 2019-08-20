@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -34,6 +35,7 @@ import com.gueg.tclwatcher.stations.StationParser
 import com.gueg.tclwatcher.stations.StationPicker
 import java.io.*
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 
 @Suppress("PrivatePropertyName")
@@ -53,6 +55,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private val MENU_ID_IMPORT = 0
     private val MENU_ID_EXPORT = 1
+    private val MENU_ID_UPDATE = 2
+    private val MENU_ID_SHARE  = 3
 
     private val IMPORT_EXPORT_BOOKMARK_LINE_SEP = "¤"
     private val IMPORT_EXPORT_BOOKMARK_SEP = "²"
@@ -120,14 +124,18 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             val intentUrl = intent.data!!.toString()
             if (intentUrl.contains("/navitia/itineraire_mobile?") || intentUrl.contains("/navitia/itineraire_mobile?"))
                 pendingRequest = intentUrl
+        } else {
+            updateIfWeekPassed()
         }
     }
 
     // Trick to make a menu with android:showAsAction="never" and icons
     // https://stackoverflow.com/a/41569543
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(Menu.NONE, MENU_ID_IMPORT, 1, menuIconWithText(resources.getDrawable(R.drawable.ic_import), resources.getString(R.string.activity_main_import)))
-        menu.add(Menu.NONE, MENU_ID_EXPORT, 2, menuIconWithText(resources.getDrawable(R.drawable.ic_export), resources.getString(R.string.activity_main_export)))
+        menu.add(Menu.NONE, MENU_ID_IMPORT, 1, menuIconWithText(resources.getDrawable(R.drawable.ic_load), resources.getString(R.string.activity_main_import)))
+        menu.add(Menu.NONE, MENU_ID_EXPORT, 2, menuIconWithText(resources.getDrawable(R.drawable.ic_save), resources.getString(R.string.activity_main_export)))
+        menu.add(Menu.NONE, MENU_ID_UPDATE, 3, menuIconWithText(resources.getDrawable(R.drawable.ic_update), resources.getString(R.string.activity_main_update)))
+        menu.add(Menu.NONE, MENU_ID_SHARE,  4, menuIconWithText(resources.getDrawable(R.drawable.ic_share), resources.getString(R.string.activity_main_share)))
         return true
     }
 
@@ -141,13 +149,24 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 checkWritePermissionAndExport()
                 return true
             }
+            MENU_ID_UPDATE -> {
+                checkWritePermissionAndUpdate(true)
+                return true
+            }
+            MENU_ID_SHARE -> {
+                val i = Intent(Intent.ACTION_SEND)
+                i.type = "text/plain"
+                i.putExtra(Intent.EXTRA_SUBJECT, "Partager")
+                i.putExtra(Intent.EXTRA_TEXT, UpdateTask.GITHUB_RELEASES_LINK)
+                startActivity(Intent.createChooser(i, "Partager avec"))
+            }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
     private fun menuIconWithText(r: Drawable, title: String): CharSequence {
-        r.setBounds(0, 0, r.intrinsicWidth/2, r.intrinsicHeight/2)
+        r.setBounds(0, 0, r.intrinsicWidth, r.intrinsicHeight)
         val sb = SpannableString("    $title")
         val imageSpan = ImageSpan(r, ImageSpan.ALIGN_BOTTOM)
         sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -262,36 +281,60 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     // ======= PERMISSIONS STUFF =======
 
 
-    private val PERMISSION_READ = 0
-    private val PERMISSION_WRITE = 1
+    private val PERMISSION_READ_IMPORT = 0
+    private val PERMISSION_WRITE_EXPORT = 1
+    private val PERMISSION_WRITE_UPDATE = 2
+    private val PERMISSION_WRITE_UPDATE_UA = 3
 
     private fun checkReadPermissionAndImport() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ_IMPORT)
         } else
             beginImport()
     }
 
     private fun checkWritePermissionAndExport() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_WRITE)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_WRITE_EXPORT)
         } else
             beginExport()
     }
 
+    private fun checkWritePermissionAndUpdate(userAsked: Boolean = false) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if(userAsked)
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_WRITE_UPDATE_UA)
+            else
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_WRITE_UPDATE)
+        } else
+            beginUpdate(userAsked)
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when (PERMISSION_READ) {
-            PERMISSION_READ -> {
+        when (PERMISSION_READ_IMPORT) {
+            PERMISSION_READ_IMPORT -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     beginImport()
                 else
                     Toast.makeText(this, "L'importation nécessite l'accès en lecture.", Toast.LENGTH_SHORT).show()
             }
-            PERMISSION_WRITE -> {
+            PERMISSION_WRITE_EXPORT -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     beginExport()
                 else
                     Toast.makeText(this, "L'exportation nécessite l'accès en écriture.", Toast.LENGTH_SHORT).show()
+            }
+            PERMISSION_WRITE_UPDATE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    beginUpdate(userAsked=false)
+                else
+                    Toast.makeText(this, "La mise à jour nécessite l'accès en écriture.", Toast.LENGTH_SHORT).show()
+            }
+            PERMISSION_WRITE_UPDATE_UA -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    beginUpdate(userAsked=true)
+                else
+                    Toast.makeText(this, "La mise à jour nécessite l'accès en écriture.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -386,7 +429,6 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         }.start()
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == MENU_ID_IMPORT && data != null) {
             if (resultCode == RESULT_OK)
@@ -396,6 +438,28 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 export(File(URI(data.data!!.toString())))
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+
+    // ======= UPDATE =======
+
+
+    private fun updateIfWeekPassed() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val lastUpdate = prefs.getLong("SEEK_FOR_UPDATES", 7)
+        if (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastUpdate) >= 7) {
+            prefs.edit().putLong("SEEK_FOR_UPDATES", System.currentTimeMillis()).apply()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Pensez à vérifier les mises à jour de l'application.", Toast.LENGTH_SHORT).show()
+                return
+            }
+            beginUpdate(userAsked=false)
+        }
+    }
+
+    private fun beginUpdate(userAsked: Boolean) {
+        UpdateTask(this, userAsked).execute()
     }
 
 }

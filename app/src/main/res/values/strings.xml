@@ -13,6 +13,8 @@
     <string name="fragment_homepage_bookmarks">Favoris</string>
     <string name="activity_main_export">Exporter</string>
     <string name="activity_main_import">Importer</string>
+    <string name="activity_main_share">Partager</string>
+    <string name="activity_main_update">Mettre à jour</string>
 
     <string-array name="spinner_dep_arr">
         <item>Partir</item>
