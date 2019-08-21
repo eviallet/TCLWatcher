@@ -13,7 +13,7 @@ Features :
 * route warnings (deviated bus stop...)
 
 
-**Download the app : [here](https://github.com/eviallet/TCLWatcher/releases/tag/v1.0.2)**
+**Download the app : [here](https://github.com/eviallet/TCLWatcher/releases)**
 
 <img src="screenshots/homepage.png" height="350" width="200"> <img src="screenshots/route.png" height="350" width="200"> <img src="screenshots/conflict.png" height="350" width="200"> <img src="screenshots/map.png" height="350" width="200"> 
 
