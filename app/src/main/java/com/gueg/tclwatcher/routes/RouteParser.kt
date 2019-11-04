@@ -1,10 +1,11 @@
 package com.gueg.tclwatcher.routes
 
+import android.content.Context
 import android.util.Log
-import com.gueg.tclwatcher.routes.Route.TCL
-import com.gueg.tclwatcher.routes.Route.Walk
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
+import com.android.volley.Response
+import com.android.volley.toolbox.Volley
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class RouteParser {
@@ -15,131 +16,111 @@ class RouteParser {
         private val threads = ArrayList<Thread>()
 
         fun cancel() {
-            for(t in threads)
+            for (t in threads)
                 t?.interrupt()
             threads.clear()
         }
 
+        private fun formatTime(str: String) : String {
+            // str : 20191028T151800
+            val s = str.split("T")[1]      // T151800
+                .substring(0,4)     // 1518
+            return "${s.substring(0,2)}:${s.substring(2)}" // 15:18
+        }
+
+        private fun formatDate(str: String) : String {
+            // str : 20191028T151800
+            val s = str.split("T")[0]      // 20191028
+                .substring(4)     // 1028
+            return "${s.substring(2)}/${s.substring(0,2)}" // 28/10
+        }
+
+        private fun formatSeconds(totalSecs: Int) : String {
+            val hours = totalSecs / 3600
+            val min = (totalSecs % 3600) / 60
+
+            return if(hours > 0 && min == 0)
+                "$hours h"
+            else if(hours == 0 && min > 0)
+                "$min min"
+            else if(min > 10)
+                "${hours}h$min"
+            else
+                "${hours}h0$min"
+        }
+
         @Throws(ParseError::class)
-        fun parseRoute(request: Request, routeParserListener: RouteParserListener, url: String="",
+        fun parseRoute(context: Context, request: RouteRequest, routeParserListener: RouteParserListener,
                        uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()) {
             val t = Thread {
-                var finalUrl = if(url.isEmpty()) request.toString() else url
+                val queue = Volley.newRequestQueue(context)
 
-                if (!finalUrl.contains("http://") && !finalUrl.contains("https://")) {
-                    val prefix = "http://m.tcl.fr"
-                    finalUrl = String.format("%s%s", prefix, finalUrl)
-                }
+                queue.add(request.build(
+                    Response.Listener { response ->
+                        val jsonResponse = JSONObject(response)
 
-                Log.d(":-:$TAG", finalUrl)
-                val page = Jsoup.connect(finalUrl).get() ?: throw ParseError("Une erreur est survenue.")
+                        val journey = (jsonResponse["journeys"] as JSONArray)[0] as JSONObject
 
-                val date = page.select("input[name=selectedDate]").first().attr("value").toString() // 2019|7|31
+                        val date = formatDate((journey["departure_date_time"] as String))
+                        val departureTime = formatTime((journey["departure_date_time"] as String))
+                        val arrivalTime = formatTime((journey["arrival_date_time"] as String))
+                        val routeLength = formatSeconds((journey["durations"] as JSONObject)["total"] as Int)
 
-                val prev = page.getElementsByClass("TRAJET-prec").attr("href")
-                val next = page.getElementsByClass("TRAJET-suiv").attr("href")
-
-                val departureTime = page.getElementsByClass("HEURE-depart").text() // 15 h 49
-                val arrivalTime = page.getElementsByClass("HEURE-arrivee").text() // 16 h 19
-                val routeLength = page.getElementsByClass("decompte-minute").text() // 30 min
-
-                val route = Route(
-                    from = request.from, to = request.to,
-                    departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength, date = date,
-                    prev = prev, next = next,
-                    request = finalUrl
-                )
-
-                val rows: Elements
-                try {
-                    // if everything went as planned
-                    rows = page.getElementsByClass("RESULTAT-TRAJET")[0].getElementsByClass("row")
-                } catch(e: IndexOutOfBoundsException) {
-                    try {
-                        // if there was any other error (out of date range, same station selected...)
-                        val error = page.getElementsByClass("ERROR")[0].text()
-                        throw ParseError(error)
-                    } catch(e: IndexOutOfBoundsException) {
-                        try {
-                            // if the station name was ambiguous, giving multiple results in a table
-                            val tableFrom = page.getElementsByClass("TABLE-form-precise")[0]
-                            val tableFromRows = tableFrom.select("tr")
-                            val choicesFrom = ArrayList<String>()
-                            val valuesFrom = ArrayList<String>()
-
-                            for (tableRow in tableFromRows) {
-                                if (tableRow.select("input[name=arretDepart]").first().attr("value").toString() != "#") { // "Modifier ma demande"
-                                    val id = tableRow.select("input[name=arretDepart]").first().attr("id")
-                                    choicesFrom.add(tableRow.select("label[for=$id]").first().text())
-                                    valuesFrom.add(tableRow.select("input[name=arretDepart]").first().attr("value").toString())
-                                }
-                            }
-
-                            val tableTo = page.getElementsByClass("TABLE-form-precise")[1]
-                            val tableToRows = tableTo.select("tr")
-                            val choicesTo = ArrayList<String>()
-                            val valuesTo = ArrayList<String>()
-
-                            for (tableRow in tableToRows) {
-                                if (tableRow.select("input[name=arretArrivee]").first().attr("value").toString() != "#") { // "Modifier ma demande"
-                                    val id = tableRow.select("input[name=arretArrivee]").first().attr("id")
-                                    choicesTo.add(tableRow.select("label[for=$id]").first().text())
-                                    valuesTo.add(tableRow.select("input[name=arretArrivee]").first().attr("value").toString())
-                                }
-                            }
-
-                            throw StationConflictError(
-                                choicesFrom,
-                                valuesFrom,
-                                choicesTo,
-                                valuesTo
-                            )
-                        } catch(e: IndexOutOfBoundsException) {
-                            throw ParseError("Erreur inconnue")
-                        }
-                    }
-                }
-
-                for (row in rows) {
-                    // walk
-                    if (row.select(".mode-de-transport.pieton").size > 0) {
-                        val duration = row.select(".mode-de-transport.pieton").text() // 1min
-                        val indications = row.select(".etape-indication-unique").text() // Marcher 1 min (2450m)
-
-                        route.add(Walk(duration = duration, additionalInfos = indications))
-                    }
-                    // TCL
-                    else if (row.select(".mode-de-transport.TCL").size > 0) {
-                        val images = row.select(".largeur-image").select("img")
-                        val first = images[0].absUrl("src")
-                        val second = images[1].absUrl("src")
-
-                        val duration = row.select(".mode-de-transport.TCL").text() // 5 min
-
-                        val firstStep = row.selectFirst(".row.etape-un")
-                        val departAt = firstStep.select(".chronometrage-arret").text() // 15:50
-                        val from = firstStep.select(".nom-etape").text() // Jean XXIII - Maryse Bastié
-                        val fromDir = firstStep.select(".nom-direction").text() // Direction  Perrache
-
-                        val secondStep = row.selectFirst(".row.etape-deux")
-                        val arriveAt = secondStep.select(".chronometrage-arret").text() // 15:55
-                        val to = secondStep.select(".nom-etape2").text() // Jet d'Eau - Mendes France
-
-                        route.add(TCL(
-                            from=from, fromDir=fromDir, to=to,
-                            departAt=departAt, arriveAt=arriveAt, duration=duration,
-                            picLeft=first, picRight=second)
+                        val route = Route(
+                            from = "", to = "",
+                            departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength, date = date,
+                            prev = "", next = ""
                         )
-                    }
-                }
 
-                val warningElement = page.select(".INFORMATIONS-IMPORTANTES")
-                if(warningElement.size > 0)
-                    route.warning = warningElement.first().select(".texte-infos-importantes").first().text()
+                        val sections = journey["sections"] as JSONArray
+                        var first = true
 
-                routeParserListener.onRouteParsed(route)
+                        for(i in 0 until sections.length()) {
+                            val section = sections[i] as JSONObject
 
-                threads.remove(Thread.currentThread())
+                            if((section["type"] as String) == "transfer")
+                                continue
+
+                            when(section["type"] as String) {
+                                "waiting" -> route.add(Route.Wait(duration = formatSeconds(section["duration"] as Int)))
+                                "public_transport" -> {
+                                    if(first) {
+                                        route.from = (section["from"] as JSONObject)["name"] as String
+                                        first = false
+                                    }
+                                    route.to = (section["from"] as JSONObject)["name"] as String
+
+                                    val transportCode = (section["display_informations"] as JSONObject)["code"] as String
+                                    val picUrl = "https://carte.tcl.fr/assets/images/lines/$transportCode.svg"
+
+                                    val displayInformations = section["display_informations"] as JSONObject
+
+                                    route.add(
+                                        Route.TCL(
+                                            from = ((section["from"] as JSONObject)["stop_point"] as JSONObject)["name"] as String,
+                                            fromDir = displayInformations["direction"] as String,
+                                            to = ((section["to"] as JSONObject)["stop_point"] as JSONObject)["name"] as String,
+                                            departAt = formatTime(section["departure_date_time"] as String),
+                                            arriveAt = formatTime(section["arrival_date_time"] as String),
+                                            duration = formatSeconds(section["duration"] as Int),
+                                            pic = picUrl
+                                        )
+                                    )
+                                }
+                                else -> {
+                                    when(section["mode"] as String) {
+                                        "walking" -> route.add(Route.Walk(duration = formatSeconds(section["duration"] as Int)))
+                                    }
+                                }
+                            }
+                        }
+
+                        routeParserListener.onRouteParsed(route)
+                    },
+                    Response.ErrorListener { err ->
+                        Log.d(":-:","RouteParser - Response.ErrorListener")
+                        err.printStackTrace()
+                    }))
 
             }.apply {
                 this.uncaughtExceptionHandler = uncaughtExceptionHandler
@@ -147,6 +128,7 @@ class RouteParser {
             }
             threads.add(t)
         }
+
     }
 
 
@@ -156,4 +138,5 @@ class RouteParser {
     interface RouteParserListener {
         fun onRouteParsed(route: Route)
     }
+
 }

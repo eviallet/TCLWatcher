@@ -1,12 +1,6 @@
 package com.gueg.tclwatcher.routes
 
-import android.util.Log
-import com.gueg.tclwatcher.MainActivity
-import com.gueg.tclwatcher.stations.StationConflictDialog
-import org.jsoup.HttpStatusException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-
+/*
 class RouteParserExceptionHandler(private val activity: MainActivity, private val request: Request, private val onRefined: ((refined: Request) -> Unit) ?= null) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(thread: Thread?, throwable: Throwable?) {
@@ -77,4 +71,4 @@ class RouteParserExceptionHandler(private val activity: MainActivity, private va
             }, from, choices, values
         ).show()
     }
-}
+}*/

@@ -7,10 +7,8 @@ data class Bookmark(
     var from: String,
     var to: String,
     var rank: Int = -1,
-    var refinedFrom: String = "",
-    var refinedTo: String = ""
+    var fromName: String,
+    var toName: String
 ) {
-    fun hasBeenRefined() = refinedFrom != "" || refinedTo != ""
-
-    override fun toString() = "$from -> $to\n\trank = $rank\n\trefinedFrom = $refinedFrom\n\trefinedTo = $refinedTo"
+    override fun toString() = "$from -> $to\n\trank = $rank\n\tfromName = $fromName\n\ttoName = $toName"
 }

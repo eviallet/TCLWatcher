@@ -60,9 +60,7 @@ class RouteFragment : Fragment() {
         duration = rootView.findViewById(R.id.fragment_route_duration)
         duration.text = route.totalDuration
         date = rootView.findViewById(R.id.fragment_route_date)
-        @Suppress("LocalVariableName") val mon_day = route.date.replace("|", "/").split("/").subList(1, 3)
-        @Suppress("LocalVariableName") val day_mon = addLeadingZero(mon_day[1]) + "/" + addLeadingZero(mon_day[0])
-        date.text = day_mon
+        date.text = route.date
 
         indicator = rootView.findViewById(R.id.fragment_route_recyclerview_indicator)
 
@@ -82,8 +80,8 @@ class RouteFragment : Fragment() {
         }
 
         recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)!!
-        adapter = SubRouteAdapter(route, routeFragmentListener)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        adapter = SubRouteAdapter(activity!!, route, routeFragmentListener)
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(VerticalDividerItemDecoration(context!!, 15))
 
@@ -121,8 +119,6 @@ class RouteFragment : Fragment() {
 
         return rootView
     }
-
-    private fun addLeadingZero(date: String) = if(date.toInt() < 10) "0$date" else date
 
     fun with(routeFragmentListener: RouteFragmentListener): RouteFragment {
         this.routeFragmentListener = routeFragmentListener

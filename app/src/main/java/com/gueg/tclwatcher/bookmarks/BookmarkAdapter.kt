@@ -2,11 +2,11 @@ package com.gueg.tclwatcher.bookmarks
 
 import android.app.Activity
 import android.support.transition.TransitionManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.gueg.tclwatcher.HomepageFragment
-import com.gueg.tclwatcher.OrientedItemDecoration
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.bookmarks.bookmarks_db.BookmarkDatabase
 
@@ -99,14 +98,9 @@ class BookmarkAdapter internal constructor(
             holder.to.startAnimation(toAnim)
 
             val index = holder.adapterPosition
-            var temp = bookmark.from
+            val temp = bookmark.from
             bookmark.from = bookmark.to
             bookmark.to = temp
-            if(bookmark.hasBeenRefined()) {
-                temp = bookmark.refinedFrom
-                bookmark.refinedFrom = bookmark.refinedTo
-                bookmark.refinedTo = temp
-            }
             bookmarks.removeAt(index)
             bookmarks.add(index, bookmark)
 
@@ -227,6 +221,8 @@ class BookmarkAdapter internal constructor(
     }
 
     private fun setRecyclerViews(holder: ViewHolder, bookmark: Bookmark) {
+        // TODO
+        /*
         holder.recyclerView1.setHasFixedSize(true)
         holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
         holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -250,7 +246,7 @@ class BookmarkAdapter internal constructor(
                 holder.arrival1.text = arrival
             }
         })
-
+*/
     }
 
     private fun refreshMoveArrows(position: Int) {

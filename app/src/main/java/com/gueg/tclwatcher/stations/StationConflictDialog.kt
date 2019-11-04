@@ -11,9 +11,12 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.routes.RouteRequestBuilder
+import com.gueg.tclwatcher.routes.RouteRequestBuilder.ResultType.*
 
 class StationConflictDialog(context: Context, private val listener: StationConflictListener, private val from: Boolean,
-                            private val choices: ArrayList<String>, private val values: ArrayList<String>) : Dialog(context) {
+                            private val choices: ArrayList<String>, private val values: ArrayList<String>, private val types: ArrayList<RouteRequestBuilder.ResultType>)
+    : Dialog(context) {
 
     private lateinit var list: RadioGroup
 
@@ -48,6 +51,14 @@ class StationConflictDialog(context: Context, private val listener: StationConfl
         for(i in 0 until choices.size) {
             val checkbox = RadioButton(context)
             checkbox.text = choices[i]
+            checkbox.setCompoundDrawablesWithIntrinsicBounds(
+                when(types[i]) {
+                    STOP_AREA -> R.drawable.stoparea
+                    POI -> R.drawable.poi
+                    ADDRESS -> R.drawable.address
+                },
+                0, 0, 0
+            )
             checkbox.id = View.generateViewId()
             buttonToPosition[checkbox.id] = i
             list.addView(checkbox)

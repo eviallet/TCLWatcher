@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gueg.tclwatcher.LoadingView
-import com.gueg.tclwatcher.MainActivity
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.stations.StationPicker
 
@@ -60,11 +59,11 @@ class RoutesFragment: Fragment() {
             override fun onPageSelected(position: Int) {
                 when (position) {
                     0 -> {
-                        pagerAdapter.loadPrevOrNext(PREV, index = position)
+                        //pagerAdapter.loadPrevOrNext(PREV, index = position)
                         leftLoadingView.loading = true
                     }
                     pagerAdapter.count - 1 -> {
-                        pagerAdapter.loadPrevOrNext(NEXT, index = position)
+                        //pagerAdapter.loadPrevOrNext(NEXT, index = position)
                         rightLoadingView.loading = true
                     }
                     else -> {
@@ -92,8 +91,8 @@ class RoutesFragment: Fragment() {
         init {
             add(route=route)
 
-            loadPrevOrNext(PREV, route)
-            loadPrevOrNext(NEXT, route)
+            //loadPrevOrNext(PREV, route)
+            //loadPrevOrNext(NEXT, route)
         }
 
         private fun add(pos: Int = -1, route: Route, index: Int = 0) {
@@ -106,7 +105,6 @@ class RoutesFragment: Fragment() {
                     }
                     activity.runOnUiThread {
                         if (pos == PREV) {
-                            Log.d(":-:","refreshing adapter")
                             viewPager.adapter = this
                             viewPager.currentItem = viewPagerPos + 1
                         } else
@@ -119,7 +117,7 @@ class RoutesFragment: Fragment() {
                 }
             }
         }
-
+/*
         fun loadPrevOrNext(prevOrNext: Int, route: Route = routes[viewPager.currentItem], index: Int = 0) {
             val url = if (prevOrNext == PREV) route.prev else route.next
             val request = Request(route.from, route.to)
@@ -137,7 +135,7 @@ class RoutesFragment: Fragment() {
                 )
             )
         }
-
+*/
         override fun getCount() = routes.size
         override fun getItem(p0: Int) = RouteFragment
             .from(routes[p0])

@@ -27,15 +27,18 @@ class Route (var from:String, var to:String, var departureTime:String, var arriv
     abstract class SubRoute(
         val from:String="", val fromDir:String="", val to:String="",
         val departAt:String="", val arriveAt:String="", val duration:String="",
-        val picLeft:String="", val picRight:String="", val additionalInfos:String="") {
+        val pic:String= "") {
         override fun toString(): String {
-            return "$from $fromDir $to $departAt $arriveAt $duration $additionalInfos"
+            return "$from $fromDir $to $departAt $arriveAt $duration"
         }
     }
 
-    class TCL(from:String, fromDir:String, to:String, departAt:String, arriveAt:String, duration:String, picLeft:String, picRight:String, additionalInfos:String="")
-        : SubRoute(from, fromDir, to, departAt, arriveAt, duration, picLeft, picRight, additionalInfos)
+    class TCL(from:String, fromDir:String, to:String, departAt:String, arriveAt:String, duration:String, pic:String)
+        : SubRoute(from, fromDir, to, departAt, arriveAt, duration, pic)
 
-    class Walk(duration:String, additionalInfos: String)
-        : SubRoute(duration=duration, additionalInfos=additionalInfos)
+    class Walk(duration:String)
+        : SubRoute(duration=duration)
+
+    class Wait(duration:String)
+        : SubRoute(duration=duration)
 }

@@ -33,7 +33,10 @@ import com.gueg.tclwatcher.map.MapActivity
 import com.gueg.tclwatcher.routes.*
 import com.gueg.tclwatcher.stations.StationParser
 import com.gueg.tclwatcher.stations.StationPicker
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -191,8 +194,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 homepageFragment.setStations(stations)
                 setFragment(homepageFragment)
 
-                if(pendingRequest != null)
-                    onExternalUrlOpened(pendingRequest!!)
+                //if(pendingRequest != null)
+                //    onExternalUrlOpened(pendingRequest!!)
             }
         }).start()
     }
@@ -249,11 +252,11 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     // ======= REQUESTS =======
 
 
-    override fun onRequestEmitted(request: Request) {
+    override fun onRequestEmitted(request: RouteRequest) {
         RouteParser.cancel()
-        RouteParser.parseRoute(request, routeParserListener, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request))
+        RouteParser.parseRoute(this, request, routeParserListener/*, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request)*/)
     }
-
+/*
     private fun onExternalUrlOpened(url: String) {
         val request = Request("","")
         RouteParser.cancel()
@@ -276,7 +279,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             }
         }, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request), url = url)
     }
-
+*/
 
     // ======= PERMISSIONS STUFF =======
 
@@ -370,6 +373,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         for(i in 0 until bookmarks.lastIndex) {
             val bookmark = bookmarks[i]
             val infos = bookmark.split(IMPORT_EXPORT_BOOKMARK_SEP)
+            // TODO
+            /*
             imported.add(Bookmark(
                 from=infos[0],
                 to=infos[1],
@@ -377,6 +382,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 refinedFrom=if(infos[3]==IMPORT_EXPORT_REFINED_NONE) "" else infos[3],
                 refinedTo=if(infos[4]==IMPORT_EXPORT_REFINED_NONE) "" else infos[4]
             ))
+            */
         }
 
         for(b in imported)
@@ -398,7 +404,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         Thread {
             val toExport = BookmarkDatabase.getDatabase(this).bookmarkDao().all
             val csv = StringBuilder()
+            /*
             for(item in toExport)
+                // TODO
                 csv
                     .append(item.from)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
@@ -426,6 +434,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+            */
         }.start()
     }
 

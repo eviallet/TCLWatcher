@@ -86,7 +86,8 @@ class StationParser {
                 val station = Station(
                     obj.getJSONObject("properties").getString("nom"),
                     coordinates.getDouble(0),
-                    coordinates.getDouble(1)
+                    coordinates.getDouble(1),
+                    obj.getJSONObject("properties").getInt("id")
                 )
                 if(!ans.contains(station))
                     ans.add(station)

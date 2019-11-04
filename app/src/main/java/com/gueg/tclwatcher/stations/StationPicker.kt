@@ -16,7 +16,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.github.ybq.android.spinkit.SpinKitView
 import com.gueg.tclwatcher.R
-import com.gueg.tclwatcher.routes.Request
+import com.gueg.tclwatcher.routes.RouteRequest
+import com.gueg.tclwatcher.routes.RouteRequestBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -37,9 +38,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     var listener: StationPickerListener?= null
     private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
     private lateinit var autoCompleteAdapter: ArrayAdapter<String>
-
-    var refinedFrom: String ?= null
-    var refinedTo: String ?= null
 
     private var firstDateNotification = true
 
@@ -125,21 +123,24 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         fab.setOnClickListener {
             if(checkText()) {
                 setLoading(true)
-                val request = Request(
-                    from = from.text.toString(),
-                    to = to.text.toString(),
-                    timeMode = if (depArr.selectedItemPosition == 0) Request.TimeMode.DEPART_AT else Request.TimeMode.ARRIVE_AT,
-                    year = year,
-                    month = getMonth(),
-                    day = getDay(),
-                    hour = timeText.text.split(":")[0].toInt(),
-                    minute = timeText.text.split(":")[1].toInt()
-                )
-                if(refinedFrom != null)
-                    request.refineFrom(refinedFrom!!)
-                if(refinedTo != null)
-                    request.refineTo(refinedTo!!)
-                listener!!.onRequestEmitted(request)
+                RouteRequestBuilder.with(context).from(from.text.toString()).to(to.text.toString()).build { fromStr, toStr ->
+                    if(fromStr.isEmpty()) {
+                        setLoading(false)
+                    } else {
+                        val request = RouteRequest(
+                            from = fromStr,
+                            to = toStr,
+                            timeMode = if (depArr.selectedItemPosition == 0) RouteRequest.TimeMode.DEPART_AT else RouteRequest.TimeMode.ARRIVE_AT,
+                            year = year,
+                            month = getMonth(),
+                            day = getDay(),
+                            hour = timeText.text.split(":")[0].toInt(),
+                            minute = timeText.text.split(":")[1].toInt()
+                        )
+                        listener!!.onRequestEmitted(request)
+                    }
+                }
+
             }
         }
 
@@ -162,10 +163,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 if(s==null) return
                 if(s.isNotEmpty())
                     from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                if(s.length < oldLength && refinedFrom != null) {
-                    refinedFrom = null
-                    refinedTo = null
-                }
                 oldLength = s.length
             }
         })
@@ -178,10 +175,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 if(s==null) return
                 if(s.isNotEmpty())
                     to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                if(s.length < oldLength && refinedTo != null) {
-                    refinedFrom = null
-                    refinedTo = null
-                }
                 oldLength = s.length
             }
         })
@@ -234,8 +227,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         autoCompleteAdapter = picker.autoCompleteAdapter
         from.setAdapter(autoCompleteAdapter)
         to.setAdapter(autoCompleteAdapter)
-        refinedFrom = picker.refinedFrom
-        refinedTo = picker.refinedTo
     }
 
     @SuppressLint("RestrictedApi")
@@ -268,14 +259,9 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun from() = from.text.toString()
     fun to() = to.text.toString()
 
-    fun fill(from: String, to: String, refinedFrom: String, refinedTo: String) {
+    fun fill(from: String, to: String) {
         CharacterAnimator(this.from, from) {
-            CharacterAnimator(this.to, to) {
-                if(refinedFrom.isNotEmpty())
-                    this.refinedFrom = refinedFrom
-                if(refinedTo.isNotEmpty())
-                    this.refinedTo = refinedTo
-            }.start()
+            CharacterAnimator(this.to, to).start()
         }.start()
     }
 
@@ -359,6 +345,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     }
 
     interface StationPickerListener {
-        fun onRequestEmitted(request: Request)
+        fun onRequestEmitted(request: RouteRequest)
     }
 }
