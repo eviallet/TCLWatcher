@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.github.ybq.android.spinkit.SpinKitView
 import com.gueg.tclwatcher.R
+import com.gueg.tclwatcher.bookmarks.Bookmark
 import com.gueg.tclwatcher.routes.RouteRequest
 import com.gueg.tclwatcher.routes.RouteRequestBuilder
 import java.util.*
@@ -40,6 +41,9 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private lateinit var autoCompleteAdapter: ArrayAdapter<String>
 
     private var firstDateNotification = true
+
+    private var refinedFrom : String ?= null
+    private var refinedTo : String ?= null
 
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
@@ -127,6 +131,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                     if(fromStr.isEmpty()) {
                         setLoading(false)
                     } else {
+                        refinedFrom = fromStr
+                        refinedTo = toStr
                         val request = RouteRequest(
                             from = fromStr,
                             to = toStr,
@@ -163,6 +169,10 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 if(s==null) return
                 if(s.isNotEmpty())
                     from.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                if(s.length < oldLength && refinedTo != null) {
+                    refinedFrom = null
+                    refinedTo = null
+                }
                 oldLength = s.length
             }
         })
@@ -175,14 +185,11 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                 if(s==null) return
                 if(s.isNotEmpty())
                     to.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                if(s.length < oldLength && refinedTo != null) {
+                    refinedFrom = null
+                    refinedTo = null
+                }
                 oldLength = s.length
-            }
-        })
-        to.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (p0 == null) return
             }
         })
 
@@ -259,10 +266,21 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun from() = from.text.toString()
     fun to() = to.text.toString()
 
-    fun fill(from: String, to: String) {
-        CharacterAnimator(this.from, from) {
-            CharacterAnimator(this.to, to).start()
+    fun fill(from: String, fromName: String= "", to: String, toName: String= "") {
+        refinedFrom = from
+        refinedTo = to
+        CharacterAnimator(this.from, fromName) {
+            CharacterAnimator(this.to, toName).start()
         }.start()
+    }
+
+    fun fillWithBookmark(bookmark: Bookmark) {
+        fill(
+            from = bookmark.from,
+            fromName = bookmark.fromName,
+            to = bookmark.to,
+            toName = bookmark.toName
+        )
     }
 
     fun fillNow(from: String, to: String) {

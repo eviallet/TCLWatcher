@@ -51,7 +51,7 @@ class RouteParser {
 
         @Throws(ParseError::class)
         fun parseRoute(context: Context, request: RouteRequest, routeParserListener: RouteParserListener,
-                       uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()) {
+                       uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()!!) {
             val t = Thread {
                 val queue = Volley.newRequestQueue(context)
 
@@ -66,30 +66,34 @@ class RouteParser {
                         val arrivalTime = formatTime((journey["arrival_date_time"] as String))
                         val routeLength = formatSeconds((journey["durations"] as JSONObject)["total"] as Int)
 
+                        val links = jsonResponse["links"] as JSONObject
+                        val prev = (links["prev"] as JSONObject)["datetime"] as String
+                        val next = (links["next"] as JSONObject)["datetime"] as String
+
                         val route = Route(
-                            from = "", to = "",
+                            from = request.from, to = request.to,
                             departureTime = departureTime, arrivalTime = arrivalTime, totalDuration = routeLength, date = date,
-                            prev = "", next = ""
+                            prev = prev, next = next
                         )
 
                         val sections = journey["sections"] as JSONArray
-                        var first = true
+
+                        // TODO /!\ WARNINGS
 
                         for(i in 0 until sections.length()) {
                             val section = sections[i] as JSONObject
 
+                            // TODO transfer : ajouter à subroute précédente pour tracer sur map
                             if((section["type"] as String) == "transfer")
                                 continue
 
                             when(section["type"] as String) {
-                                "waiting" -> route.add(Route.Wait(duration = formatSeconds(section["duration"] as Int)))
+                                "waiting" -> {
+                                    val duration = section["duration"] as Int
+                                    if(duration > 120)
+                                        route.add(Route.Wait(duration = formatSeconds(duration)))
+                                }
                                 "public_transport" -> {
-                                    if(first) {
-                                        route.from = (section["from"] as JSONObject)["name"] as String
-                                        first = false
-                                    }
-                                    route.to = (section["from"] as JSONObject)["name"] as String
-
                                     val transportCode = (section["display_informations"] as JSONObject)["code"] as String
                                     val picUrl = "https://carte.tcl.fr/assets/images/lines/$transportCode.svg"
 
@@ -109,7 +113,11 @@ class RouteParser {
                                 }
                                 else -> {
                                     when(section["mode"] as String) {
-                                        "walking" -> route.add(Route.Walk(duration = formatSeconds(section["duration"] as Int)))
+                                        "walking" -> {
+                                            val duration = section["duration"] as Int
+                                            if(duration > 120)
+                                                route.add(Route.Walk(duration = formatSeconds(duration)))
+                                        }
                                     }
                                 }
                             }

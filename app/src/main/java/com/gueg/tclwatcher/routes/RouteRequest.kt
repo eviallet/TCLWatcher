@@ -6,6 +6,7 @@ import com.android.volley.toolbox.StringRequest
 class RouteRequest(
     var from:String, var to:String,
     private var day:Int=-1, private var month:Int=-1, private var year:Int=-1, private var hour:Int=-1, private var minute:Int=-1,
+    private var datetime: String = "",
     private val timeMode: TimeMode = TimeMode.DEPART_AT
 ) {
 
@@ -18,9 +19,11 @@ class RouteRequest(
     }
 
     fun build(responseListener : Response.Listener<String>, errorListener : Response.ErrorListener) : StringRequest {
-        val date = if(day==-1) "now"
-        else
-            "${year}${addLeadingZero(month)}${addLeadingZero(day)}T${addLeadingZero(hour)}${addLeadingZero(minute)}00"
+        val date = when {
+            datetime.isNotEmpty() -> datetime
+            day==-1 -> "now"
+            else -> "${year}${addLeadingZero(month)}${addLeadingZero(day)}T${addLeadingZero(hour)}${addLeadingZero(minute)}00"
+        }
 
         return object : StringRequest(
             Method.GET,

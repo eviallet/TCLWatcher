@@ -54,21 +54,5 @@ class RouteParserExceptionHandler(private val activity: MainActivity, private va
     }
 
 
-    private fun showConflictDialog(from: Boolean, request: Request, choices: ArrayList<String>, values: ArrayList<String>, onFunctionEnd: () -> Unit) {
-        StationConflictDialog(
-            activity, object : StationConflictDialog.StationConflictListener {
-                override fun onCancelled() {
-                    activity.setError("Impossible de poursuivre.")
-                }
-
-                override fun onValidated(value: String) {
-                    if (from)
-                        request.refineFrom(value)
-                    else
-                        request.refineTo(value)
-                    onFunctionEnd()
-                }
-            }, from, choices, values
-        ).show()
-    }
-}*/
+}
+*/

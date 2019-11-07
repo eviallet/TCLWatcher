@@ -16,6 +16,7 @@ import com.gueg.tclwatcher.bookmarks.Bookmark
 import com.gueg.tclwatcher.bookmarks.BookmarkAdapter
 import com.gueg.tclwatcher.bookmarks.bookmarks_db.BookmarkDatabase
 import com.gueg.tclwatcher.map.MapActivity
+import com.gueg.tclwatcher.routes.RouteRequestBuilder
 import com.gueg.tclwatcher.stations.Station
 import com.gueg.tclwatcher.stations.StationPicker
 
@@ -56,31 +57,23 @@ class HomepageFragment : Fragment() {
         rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_map).setOnClickListener {
             activity!!.startActivity(Intent(activity, MapActivity::class.java))
         }
-        // TODO : search bookmark stop area
-        // https://carte.tcl.fr/api/autocomplete?type=inputStart&query=part+dieu ...
-/*
+
         rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_bookmarks).setOnClickListener {
             if(stationPicker.checkText()) {
                 val from = stationPicker.from()
                 val to = stationPicker.to()
-                RouteParser.parseRoute(context!!, RouteRequest(from, to), object: RouteParser.RouteParserListener {
-                    override fun onRouteParsed(route: Route) {
-                        addBookmark(Bookmark(
-                            from=stationPicker.from(),
-                            to=stationPicker.to()
-                        ))
-                    }
-                }, uncaughtExceptionHandler = RouteParserExceptionHandler(activity!! as MainActivity, RouteRequest(from, to)) { refined: RouteRequest ->
+
+                RouteRequestBuilder.with(context!!).from(from).to(to).build {refinedFrom, refinedTo ->
                     addBookmark(Bookmark(
-                        from=stationPicker.from(),
-                        to=stationPicker.to(),
-                        refinedFrom=refined.from,
-                        refinedTo=refined.to
+                        from=refinedFrom,
+                        to=refinedTo,
+                        fromName=from,
+                        toName=to
                     ))
-                })
+                }
             }
         }
-*/
+
         bookmarkRecyclerView = rootView.findViewById(R.id.fragment_homepage_recyclerview)
         bookmarkRecyclerView.setHasFixedSize(true)
         bookmarkRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -89,7 +82,7 @@ class HomepageFragment : Fragment() {
             bookmarkRecyclerView,
             object: BookmarkSelectedListener {
                 override fun onBookmarkSelected(bookmark: Bookmark) {
-                    stationPicker.fill(bookmark.from, bookmark.to)
+                    stationPicker.fillWithBookmark(bookmark)
                 }
                 override fun onBookmarkDeleted(bookmark: Bookmark) {
                     askBookmarkDeletion(bookmark)

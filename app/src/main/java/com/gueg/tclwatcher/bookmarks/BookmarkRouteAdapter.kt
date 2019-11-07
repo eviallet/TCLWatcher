@@ -5,8 +5,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import com.gueg.tclwatcher.ImageLoader
+import com.gueg.tclwatcher.ImageViewWithCache
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.routes.Route
 import com.gueg.tclwatcher.routes.RouteParser
@@ -16,14 +16,20 @@ class BookmarkRouteAdapter internal constructor(
     private val activity: Activity,
     bookmark: Bookmark,
     onTimesGot: (String, String) -> Unit,
-    onFinished: ((String) -> Unit) ?= null
+    onFinished: ((String) -> Unit) ?= null,
+    next : String = ""
 ) : RecyclerView.Adapter<BookmarkRouteAdapter.ViewHolder>() {
 
     private var loadedRoute: Route ?= null
     private val subroutes = ArrayList<Route.SubRoute>()
 
     init {
-        val request = RouteRequest(bookmark.from, bookmark.to)
+        val request =
+            if(next.isNotEmpty())
+                RouteRequest(bookmark.from, bookmark.to, datetime= next)
+            else
+                RouteRequest(bookmark.from, bookmark.to)
+
         RouteParser.parseRoute(activity, request, object: RouteParser.RouteParserListener {
             override fun onRouteParsed(route: Route) {
                 loadedRoute = route
@@ -41,7 +47,7 @@ class BookmarkRouteAdapter internal constructor(
 
 
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var pic: WebView = v.findViewById(R.id.row_bookmark_route_pic)
+        var pic: ImageViewWithCache = v.findViewById(R.id.row_bookmark_route_pic)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

@@ -33,10 +33,7 @@ import com.gueg.tclwatcher.map.MapActivity
 import com.gueg.tclwatcher.routes.*
 import com.gueg.tclwatcher.stations.StationParser
 import com.gueg.tclwatcher.stations.StationPicker
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
+import java.io.*
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -373,16 +370,13 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         for(i in 0 until bookmarks.lastIndex) {
             val bookmark = bookmarks[i]
             val infos = bookmark.split(IMPORT_EXPORT_BOOKMARK_SEP)
-            // TODO
-            /*
             imported.add(Bookmark(
                 from=infos[0],
                 to=infos[1],
                 rank=infos[2].toInt(),
-                refinedFrom=if(infos[3]==IMPORT_EXPORT_REFINED_NONE) "" else infos[3],
-                refinedTo=if(infos[4]==IMPORT_EXPORT_REFINED_NONE) "" else infos[4]
+                fromName= if(infos[3]==IMPORT_EXPORT_REFINED_NONE) "" else infos[3],
+                toName=if(infos[4]==IMPORT_EXPORT_REFINED_NONE) "" else infos[4]
             ))
-            */
         }
 
         for(b in imported)
@@ -404,9 +398,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         Thread {
             val toExport = BookmarkDatabase.getDatabase(this).bookmarkDao().all
             val csv = StringBuilder()
-            /*
             for(item in toExport)
-                // TODO
                 csv
                     .append(item.from)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
@@ -414,9 +406,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
                     .append(item.rank)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
-                    .append(if(item.refinedFrom.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.refinedFrom)
+                    .append(if(item.fromName.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.fromName)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
-                    .append(if(item.refinedTo.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.refinedTo)
+                    .append(if(item.toName.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.toName)
                     .append(IMPORT_EXPORT_BOOKMARK_LINE_SEP)
 
             val finalFile = File(file, "TCLWatcher_bkp.csv")
@@ -434,7 +426,6 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            */
         }.start()
     }
 

@@ -5,18 +5,16 @@ import android.app.Activity
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.TextView
 import com.gueg.tclwatcher.ImageLoader
+import com.gueg.tclwatcher.ImageViewWithCache
 import com.gueg.tclwatcher.R
 
 
 class SubRouteAdapter internal constructor(private val activity: Activity, route: Route, private val routeFragmentListener: RouteFragment.RouteFragmentListener) :
-    RecyclerView.Adapter<SubRouteAdapter.ViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val subroutes = route.get()
 
@@ -28,52 +26,62 @@ class SubRouteAdapter internal constructor(private val activity: Activity, route
         var from: TextView = v.findViewById(R.id.row_subroute_from)
         var fromDir: TextView = v.findViewById(R.id.row_subroute_fromdir)
         var to: TextView = v.findViewById(R.id.row_subroute_to)
-        var web: WebView = v.findViewById(R.id.row_subroute_svg)
-        var pic: ImageView = v.findViewById(R.id.row_subroute_pic)
+        var pic: ImageViewWithCache = v.findViewById(R.id.row_subroute_pic)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_subroute, parent, false))
+    inner class SmallViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        var duration: TextView = v.findViewById(R.id.row_subroute_small_duration)
+        var infos: TextView = v.findViewById(R.id.row_subroute_small_infos)
+        var pic: ImageView = v.findViewById(R.id.row_subroute_small_pic)
+    }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        when (val subroute = subroutes[position]) {
-            is Route.TCL -> {
-                holder.container.setOnClickListener { routeFragmentListener.onStationMap(subroute.from, subroute.to) }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
+        0 -> ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_subroute, parent, false))
+        else -> SmallViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_subroute_small, parent, false))
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when(holder.itemViewType) {
+            // TCL item
+            0 -> {
+                val holder = holder as ViewHolder
+                val subroute = subroutes[position]
+                holder.container.setOnClickListener {
+                    routeFragmentListener.onStationMap(
+                        subroute.from,
+                        subroute.to
+                    )
+                }
                 holder.departAt.text = subroute.departAt
                 holder.arriveAt.text = subroute.arriveAt
                 holder.duration.text = subroute.duration
                 holder.from.text = subroute.from
                 holder.fromDir.text = subroute.fromDir
                 holder.to.text = subroute.to
-                holder.web.visibility = VISIBLE
-                holder.pic.visibility = GONE
-                ImageLoader.load(activity, subroute.pic, holder.web)
+                ImageLoader.load(activity, subroute.pic, holder.pic)
             }
-            is Route.Walk -> {
-                holder.departAt.text = "  "
-                holder.arriveAt.visibility = GONE
-                holder.from.visibility = GONE
-                holder.to.visibility = GONE
-                holder.duration.text = subroute.duration
-                holder.fromDir.text = "Marcher ${subroute.duration}"
-                holder.fromDir.textSize = 14f
-                holder.web.visibility = GONE
-                holder.pic.visibility = VISIBLE
-                holder.pic.setImageResource(R.drawable.walk)
-            }
-            is Route.Wait -> {
-                holder.departAt.text = "  "
-                holder.arriveAt.visibility = GONE
-                holder.from.visibility = GONE
-                holder.to.visibility = GONE
-                holder.duration.text = subroute.duration
-                holder.fromDir.text = "Attendre ${subroute.duration}"
-                holder.fromDir.textSize = 14f
-                holder.web.visibility = GONE
-                holder.pic.visibility = VISIBLE
-                holder.pic.setImageResource(R.drawable.ic_clock)
+            // Wait or Walk item = SmallViewHolder
+            else -> {
+                val holder = holder as SmallViewHolder
+                when(val subroute = subroutes[position]) {
+                    is Route.Walk -> {
+                        holder.infos.text = "Marcher "
+                        holder.duration.text = subroute.duration
+                        holder.pic.setImageResource(R.drawable.walk)
+                    }
+                    is Route.Wait -> {
+                        holder.infos.text = "Attendre "
+                        holder.duration.text = subroute.duration
+                        holder.pic.setImageResource(R.drawable.ic_clock)
+                    }
+                    else -> {}
+                }
             }
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if(subroutes[position] is Route.TCL) 0 else 1
     }
 
     override fun getItemCount(): Int {

@@ -61,7 +61,7 @@ class RouteRequestBuilder(private val context: Context) {
         }
     }
 
-    fun searchTo(then : (from: String, to: String) -> Unit) {
+    private fun searchTo(then : (from: String, to: String) -> Unit) {
         StationDatabaseUtility.findDataByName(context, toStr) { toId ->
             if(toId.isNotEmpty()) {
                 toStr = toId
@@ -89,7 +89,7 @@ class RouteRequestBuilder(private val context: Context) {
     }
 
 
-    inner class PlacesParser(query: String, then: (resultsNames: ArrayList<String>, values: ArrayList<String>, types: ArrayList<ResultType>) -> Unit) : StringRequest(
+    private inner class PlacesParser(query: String, then: (resultsNames: ArrayList<String>, values: ArrayList<String>, types: ArrayList<ResultType>) -> Unit) : StringRequest(
         Method.GET,
         "https://www.tcl.fr/api/navitia/search-places?q=${URLEncoder.encode(query)}",
         Response.Listener<String> { response ->

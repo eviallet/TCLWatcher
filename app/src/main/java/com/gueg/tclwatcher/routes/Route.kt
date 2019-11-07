@@ -16,7 +16,7 @@ class Route (var from:String, var to:String, var departureTime:String, var arriv
     }
 
     override fun toString(): String {
-        var string = ""
+        var string = "\n"
         for(subroute in subroutes)
             string += subroute.toString() + '\n'
         return string
@@ -27,9 +27,9 @@ class Route (var from:String, var to:String, var departureTime:String, var arriv
     abstract class SubRoute(
         val from:String="", val fromDir:String="", val to:String="",
         val departAt:String="", val arriveAt:String="", val duration:String="",
-        val pic:String= "") {
+        val pic:String= "", val debugInfo:String = "") {
         override fun toString(): String {
-            return "$from $fromDir $to $departAt $arriveAt $duration"
+            return "$debugInfo $from $fromDir $to $departAt $arriveAt $duration"
         }
     }
 
@@ -37,8 +37,8 @@ class Route (var from:String, var to:String, var departureTime:String, var arriv
         : SubRoute(from, fromDir, to, departAt, arriveAt, duration, pic)
 
     class Walk(duration:String)
-        : SubRoute(duration=duration)
+        : SubRoute(duration=duration, debugInfo = "Walk : ")
 
     class Wait(duration:String)
-        : SubRoute(duration=duration)
+        : SubRoute(duration=duration, debugInfo = "Wait : ")
 }

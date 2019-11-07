@@ -1,34 +1,66 @@
 package com.gueg.tclwatcher
 
+import android.app.Activity
 import android.content.Context
-import android.webkit.WebView
+import android.content.ContextWrapper
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import java.io.File
+import java.io.FileOutputStream
 
-
-// https://stackoverflow.com/a/8987637
 
 class ImageLoader {
     companion object {
-        fun load(context: Context, url: String, webView: WebView) {
-            /*
+        fun load(activity: Activity, url: String, imageView: ImageViewWithCache) {
+            val name = url.substring(url.lastIndexOf('/')+1).replace(".svg","")
             Thread {
-                val html = Jsoup.connect(url).ignoreContentType(true).maxBodySize(Integer.MAX_VALUE).get().text()
-                Log.d(":-:", "html : $html")
+                val bmp = ImageCache.load(activity, name)
+
+                activity.runOnUiThread {
+                    if (bmp != null) {
+                        imageView.setBitmap(bmp)
+                    } else {
+                        imageView.setListener(object : ImageViewWithCache.ImageLoadedListener {
+                            override fun onImageLoaded(bmp: Bitmap?) {
+                                Thread {
+                                    if(bmp != null)
+                                        ImageCache.save(activity, name, bmp)
+                                }.start()
+                            }
+                        }).setSVG(url)
+                    }
+                }
             }.start()
+        }
+    }
 
+    object ImageCache {
 
-            val imgName = url.substring(url.lastIndexOf('/')+1).replace(".svg","")
-            val fullPath = "${context.filesDir.absolutePath}/$imgName.xml"
-            val file = File(fullPath)
+        fun save(context: Context, name: String, bmp: Bitmap) {
+            val cw = ContextWrapper(context)
+            val directory = cw.getDir("bmp_cache", Context.MODE_PRIVATE)
+            if (!directory.exists())
+                directory.mkdir()
 
+            val path = File(directory, "$name.bmp")
+            val fos = FileOutputStream(path)
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.close()
+        }
 
-            if(file.exists()) {
-                val raw = file.readLines()[0]
-                webView.loadDataWithBaseURL(url, raw, "multipart/related", "UTF-8", null)
-                Log.d(":-:","Loaded from cache")
-            } else {
-                Log.d(":-:","Loaded from url")
-            }*/
-            webView.loadUrl(url)
+        fun load(context: Context, name: String): Bitmap? {
+            val cw = ContextWrapper(context)
+            val directory = cw.getDir("bmp_cache", Context.MODE_PRIVATE)
+
+            if(!directory.exists())
+                return null
+
+            val file = File(directory.absolutePath+"/$name.bmp")
+
+            if(!file.exists())
+                return null
+
+            return BitmapFactory.decodeFile(file.absolutePath)
         }
     }
 }

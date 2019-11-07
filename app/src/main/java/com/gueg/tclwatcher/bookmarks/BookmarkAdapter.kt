@@ -2,11 +2,11 @@ package com.gueg.tclwatcher.bookmarks
 
 import android.app.Activity
 import android.support.transition.TransitionManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.gueg.tclwatcher.HomepageFragment
+import com.gueg.tclwatcher.OrientedItemDecoration
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.bookmarks.bookmarks_db.BookmarkDatabase
 
@@ -65,8 +66,8 @@ class BookmarkAdapter internal constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val bookmark = bookmarks[position]
 
-        holder.from.text = bookmark.from
-        holder.to.text = bookmark.to
+        holder.from.text = bookmark.fromName
+        holder.to.text = bookmark.toName
 
         holder.container.setOnClickListener { bookmarkSelectedListener.onBookmarkSelected(bookmark) }
 
@@ -98,8 +99,8 @@ class BookmarkAdapter internal constructor(
             holder.to.startAnimation(toAnim)
 
             val index = holder.adapterPosition
-            val temp = bookmark.from
-            bookmark.from = bookmark.to
+            val temp = bookmark.fromName
+            bookmark.from = bookmark.toName
             bookmark.to = temp
             bookmarks.removeAt(index)
             bookmarks.add(index, bookmark)
@@ -221,19 +222,17 @@ class BookmarkAdapter internal constructor(
     }
 
     private fun setRecyclerViews(holder: ViewHolder, bookmark: Bookmark) {
-        // TODO
-        /*
         holder.recyclerView1.setHasFixedSize(true)
         holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
         holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
-        holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextUrl: String ->
+        holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextDatetime: String ->
             activity.runOnUiThread {
                 holder.recyclerView2.setHasFixedSize(true)
                 holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
                 holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
-                holder.recyclerView2.adapter = BookmarkRouteAdapter(activity, bookmark, nextUrl = nextUrl, onTimesGot = { depart, arrival ->
+                holder.recyclerView2.adapter = BookmarkRouteAdapter(activity, bookmark, next = nextDatetime, onTimesGot = { depart, arrival ->
                     activity.runOnUiThread {
                         holder.depart2.text = depart
                         holder.arrival2.text = arrival
@@ -246,7 +245,6 @@ class BookmarkAdapter internal constructor(
                 holder.arrival1.text = arrival
             }
         })
-*/
     }
 
     private fun refreshMoveArrows(position: Int) {

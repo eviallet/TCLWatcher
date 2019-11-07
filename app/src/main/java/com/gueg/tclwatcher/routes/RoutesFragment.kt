@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,11 +58,11 @@ class RoutesFragment: Fragment() {
             override fun onPageSelected(position: Int) {
                 when (position) {
                     0 -> {
-                        //pagerAdapter.loadPrevOrNext(PREV, index = position)
+                        pagerAdapter.loadPrevOrNext(PREV, index = position)
                         leftLoadingView.loading = true
                     }
                     pagerAdapter.count - 1 -> {
-                        //pagerAdapter.loadPrevOrNext(NEXT, index = position)
+                        pagerAdapter.loadPrevOrNext(NEXT, index = position)
                         rightLoadingView.loading = true
                     }
                     else -> {
@@ -91,8 +90,8 @@ class RoutesFragment: Fragment() {
         init {
             add(route=route)
 
-            //loadPrevOrNext(PREV, route)
-            //loadPrevOrNext(NEXT, route)
+            loadPrevOrNext(PREV, route)
+            loadPrevOrNext(NEXT, route)
         }
 
         private fun add(pos: Int = -1, route: Route, index: Int = 0) {
@@ -117,25 +116,22 @@ class RoutesFragment: Fragment() {
                 }
             }
         }
-/*
+
         fun loadPrevOrNext(prevOrNext: Int, route: Route = routes[viewPager.currentItem], index: Int = 0) {
-            val url = if (prevOrNext == PREV) route.prev else route.next
-            val request = Request(route.from, route.to)
-            RouteParser.parseRoute(
-                request,
+            val request =
+                if(prevOrNext == PREV)
+                    RouteRequest(route.from, route.to, timeMode= RouteRequest.TimeMode.ARRIVE_AT ,datetime= route.prev)
+                else
+                    RouteRequest(route.from, route.to, datetime= route.next)
+            RouteParser.parseRoute(context!!, request,
                 object : RouteParser.RouteParserListener {
                     override fun onRouteParsed(route: Route) {
                         add(prevOrNext, route, index)
                     }
-                },
-                url = url,
-                uncaughtExceptionHandler = RouteParserExceptionHandler(
-                    activity as MainActivity,
-                    request
-                )
+                }
             )
         }
-*/
+
         override fun getCount() = routes.size
         override fun getItem(p0: Int) = RouteFragment
             .from(routes[p0])
