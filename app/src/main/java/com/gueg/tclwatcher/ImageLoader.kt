@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import java.io.File
 import java.io.FileOutputStream
 
@@ -32,6 +34,8 @@ class ImageLoader {
                 }
             }.start()
         }
+
+        fun loadDrawable(activity: Activity, name: String) = BitmapDrawable(activity.resources, ImageCache.load(activity, name)) as Drawable
     }
 
     object ImageCache {
@@ -42,7 +46,7 @@ class ImageLoader {
             if (!directory.exists())
                 directory.mkdir()
 
-            val path = File(directory, "$name.bmp")
+            val path = File(directory, "/$name.bmp")
             val fos = FileOutputStream(path)
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fos.close()

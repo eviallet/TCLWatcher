@@ -47,10 +47,7 @@ class SubRouteAdapter internal constructor(private val activity: Activity, route
                 val holder = holder as ViewHolder
                 val subroute = subroutes[position]
                 holder.container.setOnClickListener {
-                    routeFragmentListener.onStationMap(
-                        subroute.from,
-                        subroute.to
-                    )
+                    routeFragmentListener.onStationMap(subroute.coords!!, subroute.color, subroute.lineName(), subroute.from, subroute.to)
                 }
                 holder.departAt.text = subroute.departAt
                 holder.arriveAt.text = subroute.arriveAt

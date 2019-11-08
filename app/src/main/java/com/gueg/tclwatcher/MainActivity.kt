@@ -33,6 +33,7 @@ import com.gueg.tclwatcher.map.MapActivity
 import com.gueg.tclwatcher.routes.*
 import com.gueg.tclwatcher.stations.StationParser
 import com.gueg.tclwatcher.stations.StationPicker
+import org.osmdroid.util.GeoPoint
 import java.io.*
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -60,29 +61,45 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private val IMPORT_EXPORT_BOOKMARK_LINE_SEP = "¤"
     private val IMPORT_EXPORT_BOOKMARK_SEP = "²"
-    private val IMPORT_EXPORT_REFINED_NONE = "_"
 
 
     // ======= LISTENERS =======
 
 
     private val routeFragmentListener = object: RouteFragment.RouteFragmentListener {
-        override fun onStationMap(nameFrom: String, nameTo: String) {
+        override fun onStationMap(coords: ArrayList<GeoPoint>, color: Int, tcl: String, from: String, to: String) {
             val intent = Intent(applicationContext, MapActivity::class.java)
-            intent.putExtra(MapActivity.EXTRA_STATION_FROM, nameFrom)
-            intent.putExtra(MapActivity.EXTRA_STATION_TO, nameTo)
+            intent.putParcelableArrayListExtra(MapActivity.EXTRA_COORDS, coords)
+            intent.putExtra(MapActivity.EXTRA_COLOR, color)
+            intent.putExtra(MapActivity.EXTRA_TCL_NAME, tcl)
+            intent.putExtra(MapActivity.EXTRA_STATION_NAME_FROM, from)
+            intent.putExtra(MapActivity.EXTRA_STATION_NAME_TO, to)
             startActivity(intent)
         }
         override fun onRouteMap(route: Route) {
             val intent = Intent(applicationContext, MapActivity::class.java)
-            val stringArrayList = ArrayList<String>()
+            val tclNames = ArrayList<String>()
+            val fromNames = ArrayList<String>()
+            val toNames = ArrayList<String>()
+            val coordsList = ArrayList<GeoPoint>()
+            val colors = ArrayList<Int>()
             for (subroute in route.get()) {
                 if (subroute is Route.TCL) {
-                    stringArrayList.add(subroute.from)
-                    stringArrayList.add(subroute.to)
+                    coordsList.addAll(subroute.coords!!)
+                    coordsList.add(GeoPoint(0,0))
+                    colors.add(subroute.color)
+                    tclNames.add(subroute.lineName())
+                    fromNames.add(subroute.from)
+                    toNames.add(subroute.to)
                 }
             }
-            startActivity(intent.putExtra(MapActivity.EXTRA_PATH, stringArrayList))
+            startActivity(intent
+                .putExtra(MapActivity.EXTRA_PATH, coordsList)
+                .putIntegerArrayListExtra(MapActivity.EXTRA_COLORS, colors)
+                .putStringArrayListExtra(MapActivity.EXTRA_TCL_NAMES, tclNames)
+                .putStringArrayListExtra(MapActivity.EXTRA_STATIONS_NAME_FROM, fromNames)
+                .putStringArrayListExtra(MapActivity.EXTRA_STATIONS_NAME_TO, toNames)
+            )
         }
         override fun onShare(request: String) {
             val i = Intent(Intent.ACTION_SEND)
@@ -374,8 +391,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                 from=infos[0],
                 to=infos[1],
                 rank=infos[2].toInt(),
-                fromName= if(infos[3]==IMPORT_EXPORT_REFINED_NONE) "" else infos[3],
-                toName=if(infos[4]==IMPORT_EXPORT_REFINED_NONE) "" else infos[4]
+                fromName=infos[3],
+                toName=infos[4]
             ))
         }
 
@@ -406,9 +423,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
                     .append(item.rank)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
-                    .append(if(item.fromName.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.fromName)
+                    .append(item.fromName)
                     .append(IMPORT_EXPORT_BOOKMARK_SEP)
-                    .append(if(item.toName.isEmpty()) IMPORT_EXPORT_REFINED_NONE else item.toName)
+                    .append(item.toName)
                     .append(IMPORT_EXPORT_BOOKMARK_LINE_SEP)
 
             val finalFile = File(file, "TCLWatcher_bkp.csv")

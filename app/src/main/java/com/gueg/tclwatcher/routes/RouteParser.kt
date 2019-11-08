@@ -1,6 +1,7 @@
 package com.gueg.tclwatcher.routes
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import com.android.volley.NoConnectionError
 import com.android.volley.Response
@@ -8,6 +9,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.osmdroid.util.GeoPoint
 import java.net.UnknownHostException
 
 
@@ -92,7 +94,6 @@ class RouteParser {
                         for(i in 0 until sections.length()) {
                             val section = sections[i] as JSONObject
 
-                            // TODO transfer : ajouter à subroute précédente pour tracer sur map
                             if((section["type"] as String) == "transfer")
                                 continue
 
@@ -108,6 +109,18 @@ class RouteParser {
 
                                     val displayInformations = section["display_informations"] as JSONObject
 
+                                    val geojson = section["geojson"] as JSONObject
+                                    val coordinates = geojson["coordinates"] as JSONArray
+                                    val coords = ArrayList<GeoPoint>()
+
+                                    for(j in 0 until coordinates.length()) {
+                                        val point = coordinates[j] as JSONArray
+                                        val lon = point[0] as Double
+                                        val lat = point[1] as Double
+                                        coords.add(GeoPoint(lat, lon))
+                                    }
+                                    val color = Color.parseColor("#${displayInformations["color"] as String}")
+
                                     route.add(
                                         Route.TCL(
                                             from = ((section["from"] as JSONObject)["stop_point"] as JSONObject)["name"] as String,
@@ -116,7 +129,8 @@ class RouteParser {
                                             departAt = formatTime(section["departure_date_time"] as String),
                                             arriveAt = formatTime(section["arrival_date_time"] as String),
                                             duration = formatSeconds(section["duration"] as Int),
-                                            pic = picUrl
+                                            pic = picUrl,
+                                            coords = coords, color = color
                                         )
                                     )
                                 }

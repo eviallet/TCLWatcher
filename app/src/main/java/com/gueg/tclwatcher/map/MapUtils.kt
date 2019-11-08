@@ -3,7 +3,7 @@ package com.gueg.tclwatcher.map
 import android.content.Intent
 import android.graphics.Paint
 import android.net.Uri
-import android.widget.TextView
+import com.gueg.tclwatcher.ImageLoader
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.stations.Station
 import org.osmdroid.api.IGeoPoint
@@ -64,14 +64,12 @@ class MapUtils {
             return SimpleFastPointOverlay(pt, opt)
         }
 
-        fun getMarkerFromIndex(map: MapView, index: Int, geoPoint: GeoPoint, color: Int): Marker {
+        fun getMarkerFromTCL(map: MapView, geoPoint: GeoPoint, activity: MapActivity, name: String): Marker {
             val m = Marker(map)
-            m.icon = map.context.resources.getDrawable(R.drawable.ic_map_no_icon)
-            m.title = index.toString()
+            m.title = ""
+            // TODO
+            m.icon = ImageLoader.loadDrawable(activity, name)
             m.position = geoPoint
-            m.setInfoWindow(MarkerInfoWindow(R.layout.map_path_index, map))
-            m.showInfoWindow()
-            m.infoWindow.view.findViewById<TextView>(R.id.bubble_title).setTextColor(color)
             return m
         }
 
@@ -88,7 +86,29 @@ class MapUtils {
         }
 
 
-        fun getBoundaries(stations: List<Station>): BoundingBox {
+        fun getBoundaries(coords: ArrayList<GeoPoint>): BoundingBox {
+            var latitudeMin = 90.0
+            var latitudeMax = -90.0
+            var longitudeMin = 90.0
+            var longitudeMax = -90.0
+
+            for(i in 0..coords.lastIndex)
+                if(coords[i].latitude < latitudeMin && coords[i].latitude != 0.0)
+                    latitudeMin = coords[i].latitude
+            for(i in 0..coords.lastIndex)
+                if(coords[i].latitude > latitudeMax && coords[i].latitude != 0.0)
+                    latitudeMax = coords[i].latitude
+            for(i in 0..coords.lastIndex)
+                if(coords[i].longitude < longitudeMin && coords[i].latitude != 0.0)
+                    longitudeMin = coords[i].longitude
+            for(i in 0..coords.lastIndex)
+                if(coords[i].longitude > longitudeMax && coords[i].latitude != 0.0)
+                    longitudeMax = coords[i].longitude
+
+            return BoundingBox(latitudeMax + 0.008, longitudeMax + 0.008, latitudeMin - 0.008, longitudeMin - 0.008)
+        }
+
+        fun getBoundariesFromStations(stations: List<Station>): BoundingBox {
             var latMin = 90.0
             var latMax = -90.0
             var lonMin = 90.0

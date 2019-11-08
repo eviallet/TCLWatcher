@@ -56,8 +56,6 @@ class ImageViewWithCache(context: Context, attrs : AttributeSet?= null) : FrameL
     fun drawViewToBitmap(view: View) : Bitmap? {
         val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        val background = view.background ?: return null
-        background.draw(canvas)
         view.draw(canvas)
         return bitmap
     }

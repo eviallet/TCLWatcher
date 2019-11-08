@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.VerticalDividerItemDecoration
+import org.osmdroid.util.GeoPoint
 import kotlin.math.hypot
 
 
@@ -132,7 +133,7 @@ class RouteFragment : Fragment() {
     }
 
     interface RouteFragmentListener {
-        fun onStationMap(nameFrom: String, nameTo: String)
+        fun onStationMap(coords: ArrayList<GeoPoint>, color: Int, tcl: String, from: String, to:String)
         fun onRouteMap(route: Route)
         fun onShare(request: String)
     }

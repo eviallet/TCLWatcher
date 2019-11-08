@@ -1,6 +1,9 @@
 package com.gueg.tclwatcher.stations.stations_db
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
 import com.gueg.tclwatcher.stations.Station
 
 @Dao
