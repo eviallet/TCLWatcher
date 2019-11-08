@@ -70,8 +70,8 @@ class RouteRequestBuilder(private val context: Context) {
                 queue.add(
                     PlacesParser(toStr) { results, values, types ->
                         if(results.size == 1) {
-                            fromStr = values[0]
-                            searchTo(then)
+                            toStr = values[0]
+                            then(fromStr, toStr)
                         } else {
                             StationConflictDialog(context, object: StationConflictDialog.StationConflictListener {
                                 override fun onValidated(value: String) {

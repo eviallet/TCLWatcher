@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     override fun onRequestEmitted(request: RouteRequest) {
         RouteParser.cancel()
-        RouteParser.parseRoute(this, request, routeParserListener/*, uncaughtExceptionHandler = RouteParserExceptionHandler(this, request)*/)
+        RouteParser.parseRoute(this, request, routeParserListener, uncaughtExceptionHandler = RouteParserExceptionHandler(this))
     }
 /*
     private fun onExternalUrlOpened(url: String) {

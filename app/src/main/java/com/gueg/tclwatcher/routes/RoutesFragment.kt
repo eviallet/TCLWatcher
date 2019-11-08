@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gueg.tclwatcher.LoadingView
+import com.gueg.tclwatcher.MainActivity
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.stations.StationPicker
 
@@ -129,7 +130,7 @@ class RoutesFragment: Fragment() {
                         add(prevOrNext, route, index)
                     }
                 }
-            )
+            ,uncaughtExceptionHandler = RouteParserExceptionHandler(activity as MainActivity))
         }
 
         override fun getCount() = routes.size

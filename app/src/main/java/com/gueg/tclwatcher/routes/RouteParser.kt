@@ -2,10 +2,13 @@ package com.gueg.tclwatcher.routes
 
 import android.content.Context
 import android.util.Log
+import com.android.volley.NoConnectionError
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import java.net.UnknownHostException
 
 
 class RouteParser {
@@ -49,17 +52,23 @@ class RouteParser {
                 "${hours}h0$min"
         }
 
-        @Throws(ParseError::class)
+        @Throws(Exception::class)
         fun parseRoute(context: Context, request: RouteRequest, routeParserListener: RouteParserListener,
                        uncaughtExceptionHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()!!) {
-            val t = Thread {
-                val queue = Volley.newRequestQueue(context)
+            val queue = Volley.newRequestQueue(context)
 
-                queue.add(request.build(
-                    Response.Listener { response ->
+            queue.add(request.build(
+                Response.Listener { response ->
+                    val t = Thread {
                         val jsonResponse = JSONObject(response)
 
-                        val journey = (jsonResponse["journeys"] as JSONArray)[0] as JSONObject
+                        val journey : JSONObject?
+                        try {
+                            journey = (jsonResponse["journeys"] as JSONArray)[0] as JSONObject
+                        } catch(e: JSONException) {
+                            Log.d(":-:","Aucun itinéraire trouvé")
+                            throw ParseError("Aucun itinéraire trouvé.")
+                        }
 
                         val date = formatDate((journey["departure_date_time"] as String))
                         val departureTime = formatTime((journey["departure_date_time"] as String))
@@ -124,24 +133,27 @@ class RouteParser {
                         }
 
                         routeParserListener.onRouteParsed(route)
-                    },
-                    Response.ErrorListener { err ->
-                        Log.d(":-:","RouteParser - Response.ErrorListener")
-                        err.printStackTrace()
-                    }))
 
-            }.apply {
-                this.uncaughtExceptionHandler = uncaughtExceptionHandler
-                start()
-            }
-            threads.add(t)
+                        threads.remove(Thread.currentThread())
+                    }.apply {
+                        this.uncaughtExceptionHandler = uncaughtExceptionHandler
+                        start()
+                    }
+                    threads.add(t)
+                },
+                Response.ErrorListener { err ->
+                    when(err) {
+                        is NoConnectionError -> uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), ConnectionError("Aucune connexion internet."))
+                        is UnknownHostException -> uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), ConnectionError("Serveurs hors ligne."))
+                        else -> uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), RuntimeException("Une erreur inconnue est survenue."))
+                    }
+                }))
         }
 
     }
 
-
+    class ConnectionError(message: String) : RuntimeException(message)
     class ParseError(message: String) : RuntimeException(message)
-    class StationConflictError(val choicesFrom: ArrayList<String>, val valuesFrom: ArrayList<String>, val choicesTo: ArrayList<String>, val valuesTo: ArrayList<String>) : RuntimeException()
 
     interface RouteParserListener {
         fun onRouteParsed(route: Route)
