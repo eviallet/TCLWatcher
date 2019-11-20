@@ -99,8 +99,8 @@ class BookmarkAdapter internal constructor(
             holder.to.startAnimation(toAnim)
 
             val index = holder.adapterPosition
-            val temp = bookmark.fromName
-            bookmark.from = bookmark.toName
+            val temp = bookmark.from
+            bookmark.from = bookmark.to
             bookmark.to = temp
             bookmarks.removeAt(index)
             bookmarks.add(index, bookmark)
