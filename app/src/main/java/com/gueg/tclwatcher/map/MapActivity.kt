@@ -173,7 +173,7 @@ class MapActivity : AppCompatActivity() {
 
     private fun contains(stations: ArrayList<Station>, name: String): Boolean {
         for(station in stations)
-            if(station.name == name)
+            if(stations!=null && station.name == name)
                 return true
         return false
     }

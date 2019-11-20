@@ -226,6 +226,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun initFrom(picker: StationPicker) {
         from.text = picker.from.text
         to.text = picker.to.text
+        refinedFrom = picker.refinedFrom
+        refinedTo = picker.refinedTo
         depArr.setSelection(picker.depArr.selectedItemPosition)
         dateText.text = picker.dateText.text
         timeText.text = picker.timeText.text

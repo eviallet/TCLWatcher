@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import java.io.File
@@ -25,8 +26,20 @@ class ImageLoader {
                         imageView.setListener(object : ImageViewWithCache.ImageLoadedListener {
                             override fun onImageLoaded(bmp: Bitmap?) {
                                 Thread {
-                                    if(bmp != null)
-                                        ImageCache.save(activity, name, bmp)
+                                    if(bmp != null) {
+                                        // save only if webview didn't return an empty image
+                                        var isWhiteOnly = true
+                                        val pixels = IntArray(bmp.height*bmp.width)
+                                        bmp.getPixels(pixels, /*offset*/ 0, /*stride*/ bmp.width, /*x*/ 0, /*y*/ 0, /*width*/ bmp.width, /*height*/ bmp.height)
+                                        for(pixel in pixels) {
+                                            if(pixel != Color.WHITE) {
+                                                isWhiteOnly = true
+                                                break
+                                            }
+                                        }
+                                        if(!isWhiteOnly)
+                                            ImageCache.save(activity, name, bmp)
+                                    }
                                 }.start()
                             }
                         }).setSVG(url)
