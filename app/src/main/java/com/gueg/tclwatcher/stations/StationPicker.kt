@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.os.Handler
-import android.support.design.widget.FloatingActionButton
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -15,6 +14,7 @@ import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.github.ybq.android.spinkit.SpinKitView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.bookmarks.Bookmark
 import com.gueg.tclwatcher.routes.RouteRequest

@@ -1,9 +1,6 @@
 package com.gueg.tclwatcher.bookmarks
 
 import android.app.Activity
-import android.support.transition.TransitionManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -14,6 +11,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import com.gueg.tclwatcher.HomepageFragment
 import com.gueg.tclwatcher.OrientedItemDecoration
 import com.gueg.tclwatcher.R

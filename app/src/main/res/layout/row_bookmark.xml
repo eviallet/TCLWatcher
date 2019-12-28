@@ -4,7 +4,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -50,9 +50,9 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"/>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -86,7 +86,7 @@
 
                         android:textColor="@android:color/black"
                         android:layout_weight="1"/>
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/row_bookmark_recyclerview_1"
                         android:layout_width="0dp"
                         android:layout_height="22dp"
@@ -117,7 +117,7 @@
                         android:textColor="@android:color/black"
 
                         android:layout_weight="1"/>
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/row_bookmark_recyclerview_2"
                         android:layout_width="0dp"
                         android:layout_height="22dp"
@@ -201,6 +201,6 @@
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

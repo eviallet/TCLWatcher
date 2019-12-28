@@ -2,9 +2,9 @@ package com.gueg.tclwatcher
 
 import android.content.Context
 import android.graphics.Rect
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 
 class VerticalDividerItemDecoration(context: Context, private val spaceHeight: Int) : DividerItemDecoration(context, VERTICAL) {
 

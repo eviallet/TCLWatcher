@@ -7,10 +7,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -22,6 +18,10 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.aditya.filebrowser.Constants
 import com.aditya.filebrowser.FileChooser
 import com.aditya.filebrowser.FolderChooser
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
     private var loadingFragment = LoadingFragment()
     private var homepageFragment = HomepageFragment()
-    private var currentFragment: Fragment ?= null
+    private var currentFragment: Fragment?= null
 
     private var pendingRequest: String ?= null
 
