@@ -1,13 +1,11 @@
 package com.gueg.tclwatcher
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gueg.tclwatcher.bookmarks.Bookmark
 import com.gueg.tclwatcher.bookmarks.BookmarkAdapter
 import com.gueg.tclwatcher.bookmarks.bookmarks_db.BookmarkDatabase
-import com.gueg.tclwatcher.map.MapActivity
 import com.gueg.tclwatcher.routes.RouteRequestBuilder
 import com.gueg.tclwatcher.stations.Station
 import com.gueg.tclwatcher.stations.StationPicker
@@ -54,26 +51,6 @@ class HomepageFragment : Fragment() {
             stationPicker.fillNow(tempFrom, tempTo)
         }
 
-        rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_map).setOnClickListener {
-            activity!!.startActivity(Intent(activity, MapActivity::class.java))
-        }
-
-        rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_bookmarks).setOnClickListener {
-            if(stationPicker.checkText()) {
-                val from = stationPicker.from()
-                val to = stationPicker.to()
-
-                RouteRequestBuilder.with(context!!).from(from).to(to).build {refinedFrom, refinedTo ->
-                    addBookmark(Bookmark(
-                        from=refinedFrom,
-                        to=refinedTo,
-                        fromName=from,
-                        toName=to
-                    ))
-                }
-            }
-        }
-
         bookmarkRecyclerView = rootView.findViewById(R.id.fragment_homepage_recyclerview)
         bookmarkRecyclerView.setHasFixedSize(true)
         bookmarkRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -94,11 +71,25 @@ class HomepageFragment : Fragment() {
 
         bookmarkRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
 
+        // TODO menu bar
+        /*
         rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_refresh).setOnClickListener {
             bookmarkAdapter.refresh()
         }
+        */
 
         return rootView
+    }
+
+    fun tryAddBookmark(from: String, to: String) {
+        RouteRequestBuilder.with(context!!).from(from).to(to).build { refinedFrom, refinedTo ->
+            addBookmark(Bookmark(
+                from=refinedFrom,
+                to=refinedTo,
+                fromName=from,
+                toName=to
+            ))
+        }
     }
 
     fun addBookmark(bookmark: Bookmark) {

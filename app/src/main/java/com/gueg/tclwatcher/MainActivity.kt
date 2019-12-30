@@ -270,6 +270,10 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         RouteParser.cancel()
         RouteParser.parseRoute(this, request, routeParserListener, uncaughtExceptionHandler = RouteParserExceptionHandler(this))
     }
+
+    override fun onBookmarkAdded(from: String, to: String) {
+        homepageFragment.tryAddBookmark(from, to)
+    }
 /*
     private fun onExternalUrlOpened(url: String) {
         val request = Request("","")

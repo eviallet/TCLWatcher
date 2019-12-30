@@ -1,6 +1,5 @@
 package com.gueg.tclwatcher.stations
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -11,10 +10,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.view.animation.AnticipateOvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.github.ybq.android.spinkit.SpinKitView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.bookmarks.Bookmark
 import com.gueg.tclwatcher.routes.RouteRequest
@@ -28,13 +28,16 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private var loading: SpinKitView
     private var from: AutoCompleteTextView
     private var to: AutoCompleteTextView
-    private var fab: FloatingActionButton
-    private var swap: Button
+    private var fab: ExtendedFloatingActionButton
+    private var swap: ImageButton
+    private var bookmark: ImageButton
+    private var depArrLayout: RelativeLayout
     private var depArr: Spinner
-    private var dateLayout: LinearLayout
+    private val depArrText: TextView
+    private var dateLayout: RelativeLayout
     private var dateText: TextView
     private var dateSpinner: Spinner
-    private var timeLayout: LinearLayout
+    private var timeLayout: RelativeLayout
     private var timeText: TextView
     var listener: StationPickerListener?= null
     private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -45,6 +48,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     private var refinedFrom : String ?= null
     private var refinedTo : String ?= null
 
+    private var swapAnimationRunning = false
+
     init {
         addView(View.inflate(context, R.layout.view_stationpicker, null))
 
@@ -53,11 +58,25 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         loading = findViewById(R.id.view_stationpicker_loading)
 
+        bookmark = findViewById(R.id.view_stationpicker_bookmark)
+        bookmark.setOnClickListener { listener!!.onBookmarkAdded(from.text.toString(), to.text.toString()) }
+
+        depArrText = findViewById(R.id.view_stationpicker_param_dep_arr_text)
+
         depArr = findViewById(R.id.view_stationpicker_param_dep_arr)
         val depArrAdapter = ArrayAdapter.createFromResource(context,
             R.array.spinner_dep_arr,
             R.layout.view_spinner
         )
+        depArrLayout = findViewById(R.id.view_stationpicker_param_dep_arr_layout)
+        depArrLayout.setOnClickListener { depArr.performClick() }
+        depArr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                depArrText.text = depArrAdapter.getItem(position)
+            }
+        }
+
         depArrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         depArr.adapter = depArrAdapter
         depArr.setSelection(0)
@@ -174,6 +193,11 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                     refinedTo = null
                 }
                 oldLength = s.length
+
+                if(s.isNotEmpty()&&to.text.isNotEmpty()&&bookmark.visibility == GONE)
+                    bookmark.visibility = View.VISIBLE
+                if(s.isEmpty()&&bookmark.visibility == View.VISIBLE)
+                    bookmark.visibility = View.GONE
             }
         })
 
@@ -190,11 +214,26 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
                     refinedTo = null
                 }
                 oldLength = s.length
+
+                if(s.isNotEmpty()&&from.text.isNotEmpty()&&bookmark.visibility == GONE)
+                    bookmark.visibility = View.VISIBLE
+                if(s.isEmpty()&&bookmark.visibility == View.VISIBLE)
+                    bookmark.visibility = View.GONE
             }
         })
 
         swap = findViewById(R.id.view_stationpicker_swap)
         swap.setOnClickListener {
+            if(!swapAnimationRunning) {
+                swap.animate()
+                    .rotationBy(180f)
+                    .setInterpolator(AnticipateOvershootInterpolator(2f))
+                    .setDuration(450)
+                    .withEndAction { swapAnimationRunning = false }
+                    .start()
+                swapAnimationRunning = true
+            }
+
             val fromText = from.text
             val toText = to.text
 
@@ -238,15 +277,14 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         to.setAdapter(autoCompleteAdapter)
     }
 
-    @SuppressLint("RestrictedApi")
     fun setLoading(loading: Boolean) {
         if(loading) {
+            // TODO morph search icon into loading animation
             this.loading.visibility = View.VISIBLE
-            fab.animate().rotation(90f).alpha(0f).withEndAction { fab.visibility = View.INVISIBLE }
+            fab.text = "Chargement..."
         } else {
             this.loading.visibility = View.GONE
-            fab.visibility = View.VISIBLE
-            fab.animate().rotation(0f).alpha(1f)
+            fab.text = "Rechercher"
         }
     }
 
@@ -271,9 +309,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun fill(from: String, fromName: String= "", to: String, toName: String= "") {
         refinedFrom = from
         refinedTo = to
-        CharacterAnimator(this.from, fromName) {
-            CharacterAnimator(this.to, toName).start()
-        }.start()
+        CharacterAnimator(this.from, fromName).start()
+        CharacterAnimator(this.to, toName).start()
     }
 
     fun fillWithBookmark(bookmark: Bookmark) {
@@ -366,5 +403,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
     interface StationPickerListener {
         fun onRequestEmitted(request: RouteRequest)
+        fun onBookmarkAdded(from: String, to: String)
     }
 }
