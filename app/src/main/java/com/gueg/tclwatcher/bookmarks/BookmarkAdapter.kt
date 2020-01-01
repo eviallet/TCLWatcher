@@ -1,16 +1,15 @@
 package com.gueg.tclwatcher.bookmarks
 
 import android.app.Activity
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
@@ -39,25 +38,27 @@ class BookmarkAdapter internal constructor(
 
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var isExpanded = false
+        var areSettingsVisible = false
         var isFirstExpanding = true
         var isAnimatingExpandArrow = false
+        var details: View = v.findViewById(R.id.row_bookmark_details)
         var container: View = v.findViewById(R.id.row_bookmark_container)
+        var routeLayout: LinearLayout = v.findViewById(R.id.row_bookmark_details_routes_layout)
         var from: TextView = v.findViewById(R.id.row_bookmark_from)
         var to: TextView = v.findViewById(R.id.row_bookmark_to)
         var swap: ImageButton = v.findViewById(R.id.row_bookmark_swap)
         var delete: ImageButton = v.findViewById(R.id.row_bookmark_remove)
+        var settings: ImageButton = v.findViewById(R.id.row_bookmark_settings)
+        var moveLayout: RelativeLayout = v.findViewById(R.id.row_bookmark_settings_move_layout)
         var moveup: ImageButton = v.findViewById(R.id.row_bookmark_moveup)
         var movedown: ImageButton = v.findViewById(R.id.row_bookmark_movedown)
-        var expand: LinearLayout = v.findViewById(R.id.row_bookmark_expand)
         var expandArrow: ImageView = v.findViewById(R.id.row_bookmark_expand_arrow)
         var recyclerView1: RecyclerView = v.findViewById(R.id.row_bookmark_recyclerview_1)
         var depart1: TextView = v.findViewById(R.id.row_bookmark_recyclerview1_depart)
         var arrival1: TextView = v.findViewById(R.id.row_bookmark_recyclerview1_arrival)
-        var container1: LinearLayout = v.findViewById(R.id.row_bookmark_recyclerview1_container)
         var recyclerView2: RecyclerView = v.findViewById(R.id.row_bookmark_recyclerview_2)
         var depart2: TextView = v.findViewById(R.id.row_bookmark_recyclerview2_depart)
         var arrival2: TextView = v.findViewById(R.id.row_bookmark_recyclerview2_arrival)
-        var container2: LinearLayout = v.findViewById(R.id.row_bookmark_recyclerview2_container)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -69,9 +70,19 @@ class BookmarkAdapter internal constructor(
         holder.from.text = bookmark.fromName
         holder.to.text = bookmark.toName
 
-        holder.container.setOnClickListener { bookmarkSelectedListener.onBookmarkSelected(bookmark) }
+        holder.container.setOnClickListener {
+            holder.expandArrow.performClick()
+            //bookmarkSelectedListener.onBookmarkSelected(bookmark)
+        }
 
         holder.swap.setOnClickListener {
+            val d = (holder.swap.drawable as AnimatedVectorDrawable)
+
+            if(!d.isRunning)
+                d.start()
+            else
+                d.reset()
+
             val fromText = holder.from.text
             val toText = holder.to.text
 
@@ -106,6 +117,30 @@ class BookmarkAdapter internal constructor(
             bookmarks.add(index, bookmark)
 
             refresh(index)
+        }
+
+        holder.settings.setOnClickListener {
+            val d = (holder.settings.drawable as AnimatedVectorDrawable)
+
+            if(!d.isRunning)
+                d.start()
+            else
+                d.reset()
+
+            if(!holder.areSettingsVisible) {
+                holder.moveLayout.visibility = VISIBLE
+                refreshMoveArrows(position)
+                holder.delete.visibility = VISIBLE
+                holder.routeLayout.animate().alpha(0f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
+            } else {
+                holder.moveLayout.visibility = GONE
+                holder.moveup.visibility = GONE
+                holder.movedown.visibility = GONE
+                holder.delete.visibility = GONE
+                holder.routeLayout.animate().alpha(1f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
+            }
+
+            holder.areSettingsVisible = !holder.areSettingsVisible
         }
 
         holder.delete.setOnClickListener { bookmarkSelectedListener.onBookmarkDeleted(bookmark) }
@@ -150,38 +185,23 @@ class BookmarkAdapter internal constructor(
             }.start()
         }
 
-        holder.expand.setOnClickListener {
+        holder.expandArrow.setOnClickListener {
             TransitionManager.beginDelayedTransition(recyclerView)
             if(holder.isExpanded) {
-                holder.container1.visibility = GONE
-                holder.container2.visibility = GONE
-                holder.delete.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { holder.delete.visibility = GONE }
-                holder.moveup.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { holder.moveup.visibility = GONE }
-                holder.movedown.animate().alpha(0f).scaleX(0.3f).scaleY(0.3f).withEndAction { holder.movedown.visibility = GONE }
+                holder.details.visibility = GONE
             } else {
                 if(holder.isFirstExpanding) {
                     setRecyclerViews(holder, bookmark)
                     holder.isFirstExpanding = false
                 }
 
-                holder.container1.visibility = VISIBLE
-                holder.container2.visibility = VISIBLE
-                holder.delete.visibility = VISIBLE
-                holder.delete.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                if(holder.adapterPosition != 0) {
-                    holder.moveup.visibility = VISIBLE
-                    holder.moveup.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                }
-                if(holder.adapterPosition != bookmarks.lastIndex) {
-                    holder.movedown.visibility = VISIBLE
-                    holder.movedown.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                }
+                holder.details.visibility = VISIBLE
             }
 
             if(!holder.isAnimatingExpandArrow) {
                 holder.isAnimatingExpandArrow = true
                 holder.expandArrow.animate().rotationBy(180f * if(holder.isExpanded) 1 else -1)
-                    .withEndAction { holder.isAnimatingExpandArrow = false }
+                    .withEndAction { holder.isAnimatingExpandArrow = false }.start()
             }
 
             holder.isExpanded = !holder.isExpanded
@@ -260,14 +280,12 @@ class BookmarkAdapter internal constructor(
             holder.moveup.visibility = GONE
         else if(holder.moveup.visibility != VISIBLE) {
             holder.moveup.visibility = VISIBLE
-            holder.moveup.animate().alpha(1f).scaleX(1f).scaleY(1f)
         }
 
         if(position==bookmarks.lastIndex)
             holder.movedown.visibility = GONE
         else if(holder.movedown.visibility != VISIBLE) {
             holder.movedown.visibility = VISIBLE
-            holder.movedown.animate().alpha(1f).scaleX(1f).scaleY(1f)
         }
 
     }

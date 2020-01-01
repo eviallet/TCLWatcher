@@ -10,6 +10,13 @@
 
     <color name="homepageButtonsColor">#A95A5A5A</color>
 
+    <color name="detailsSwapButtonColor">#B7549C</color>
+    <color name="detailsDeleteButtonColor">#F38423</color>
+    <color name="detailsUpButtonColor">#507B97</color>
+    <color name="detailsDownButtonColor">#505997</color>
+    <color name="detailsSettingsButtonColor">#509789</color>
+    <color name="detailsBackgroundColor">#EEEEEE</color>
+
     <color name="errorBkg">#FD9726</color>
     <color name="errorText">#3D2409</color>
 </resources>
