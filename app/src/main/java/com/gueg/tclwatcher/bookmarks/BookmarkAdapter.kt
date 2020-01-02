@@ -38,6 +38,7 @@ class BookmarkAdapter internal constructor(
 
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var isExpanded = false
+        var isArrowExpanded = false
         var areSettingsVisible = false
         var isFirstExpanding = true
         var isAnimatingExpandArrow = false
@@ -72,7 +73,11 @@ class BookmarkAdapter internal constructor(
 
         holder.container.setOnClickListener {
             holder.expandArrow.performClick()
-            //bookmarkSelectedListener.onBookmarkSelected(bookmark)
+        }
+
+        holder.container.setOnLongClickListener {
+            bookmarkSelectedListener.onBookmarkSelected(bookmark)
+            true
         }
 
         holder.swap.setOnClickListener {
@@ -80,8 +85,6 @@ class BookmarkAdapter internal constructor(
 
             if(!d.isRunning)
                 d.start()
-            else
-                d.reset()
 
             val fromText = holder.from.text
             val toText = holder.to.text
@@ -124,8 +127,6 @@ class BookmarkAdapter internal constructor(
 
             if(!d.isRunning)
                 d.start()
-            else
-                d.reset()
 
             if(!holder.areSettingsVisible) {
                 holder.moveLayout.visibility = VISIBLE
@@ -201,7 +202,14 @@ class BookmarkAdapter internal constructor(
             if(!holder.isAnimatingExpandArrow) {
                 holder.isAnimatingExpandArrow = true
                 holder.expandArrow.animate().rotationBy(180f * if(holder.isExpanded) 1 else -1)
-                    .withEndAction { holder.isAnimatingExpandArrow = false }.start()
+                    .withStartAction {
+                        holder.isArrowExpanded = !holder.isExpanded
+                    }
+                    .withEndAction {
+                        holder.isAnimatingExpandArrow = false
+                        if(holder.isExpanded!=holder.isArrowExpanded)
+                            holder.expandArrow.rotation = if(holder.isExpanded) 90f else -90f
+                    }.start()
             }
 
             holder.isExpanded = !holder.isExpanded

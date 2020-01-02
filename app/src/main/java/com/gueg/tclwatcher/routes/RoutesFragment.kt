@@ -53,6 +53,8 @@ class RoutesFragment: Fragment() {
         if(tempStationPickerData != null)
             stationPicker.initFrom(tempStationPickerData!!)
 
+        stationPicker.showTitle(false)
+
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}

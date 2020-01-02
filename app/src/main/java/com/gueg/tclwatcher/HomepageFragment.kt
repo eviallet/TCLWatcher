@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,6 +52,8 @@ class HomepageFragment : Fragment() {
             stationPicker.fillNow(tempFrom, tempTo)
         }
 
+        stationPicker.showTitle(true)
+
         bookmarkRecyclerView = rootView.findViewById(R.id.fragment_homepage_recyclerview)
         bookmarkRecyclerView.setHasFixedSize(true)
         bookmarkRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -71,12 +74,9 @@ class HomepageFragment : Fragment() {
 
         bookmarkRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
 
-        // TODO menu bar
-        /*
         rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_refresh).setOnClickListener {
             bookmarkAdapter.refresh()
         }
-        */
 
         return rootView
     }

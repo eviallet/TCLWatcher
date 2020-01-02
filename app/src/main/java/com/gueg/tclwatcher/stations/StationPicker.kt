@@ -25,6 +25,7 @@ import kotlin.collections.ArrayList
 
 class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout(context, attrs) {
 
+    private var titleText: TextView
     private var loading: SpinKitView
     private var from: AutoCompleteTextView
     private var to: AutoCompleteTextView
@@ -55,6 +56,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
 
         from = findViewById(R.id.view_stationpicker_from)
         to = findViewById(R.id.view_stationpicker_to)
+
+        titleText = findViewById(R.id.view_stationpicker_text_search)
 
         loading = findViewById(R.id.view_stationpicker_loading)
 
@@ -260,6 +263,13 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
             })
             to.startAnimation(toAnim)
         }
+    }
+
+    fun showTitle(show: Boolean) {
+        if(show)
+            titleText.visibility = View.VISIBLE
+        else
+            titleText.visibility = View.GONE
     }
 
     fun initFrom(picker: StationPicker) {
