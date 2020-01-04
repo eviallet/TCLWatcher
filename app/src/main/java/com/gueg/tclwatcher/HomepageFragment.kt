@@ -2,6 +2,7 @@ package com.gueg.tclwatcher
 
 import android.content.DialogInterface
 import android.database.sqlite.SQLiteConstraintException
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,9 @@ class HomepageFragment : Fragment() {
 
     private lateinit var bookmarkRecyclerView: RecyclerView
     private lateinit var bookmarkAdapter: BookmarkAdapter
+
+    private lateinit var refresh: ImageButton
+    private var isRefreshAnimated = false
 
     private lateinit var stationPickerListener: StationPicker.StationPickerListener
     private lateinit var stations: List<Station>
@@ -74,8 +78,13 @@ class HomepageFragment : Fragment() {
 
         bookmarkRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
 
-        rootView.findViewById<ImageButton>(R.id.fragment_homepage_menu_refresh).setOnClickListener {
-            bookmarkAdapter.refresh()
+        refresh = rootView.findViewById(R.id.fragment_homepage_menu_refresh)
+        refresh.setOnClickListener {
+            val d = refresh.drawable as AnimatedVectorDrawable
+            if(!d.isRunning) {
+                d.start()
+                bookmarkAdapter.refresh()
+            }
         }
 
         return rootView

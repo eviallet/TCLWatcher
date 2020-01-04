@@ -38,7 +38,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
 
-                    android:src="@drawable/ic_refresh"
+                    android:src="@drawable/vec_refresh"
                     android:padding="5dp"
                     android:background="@drawable/bkg_square_rounded_button"
 

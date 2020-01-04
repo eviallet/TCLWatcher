@@ -10,7 +10,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.github.ybq.android.spinkit.SpinKitView
@@ -228,11 +229,37 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         swap = findViewById(R.id.view_stationpicker_swap)
         swap.setOnClickListener {
             if(!swapAnimationRunning) {
+                val duration = 450L
+                /*
                 swap.animate()
                     .rotationBy(180f)
                     .setInterpolator(AnticipateOvershootInterpolator(2f))
-                    .setDuration(450)
-                    .withEndAction { swapAnimationRunning = false }
+                    .setDuration(duration)
+                    .withEndAction {
+                        swapAnimationRunning = false
+                    }
+                    .start()
+                */
+                swap.animate()
+                    .rotationBy(90f)
+                    .setInterpolator(AnticipateInterpolator(2f))
+                    .setDuration(duration/2)
+                    .withEndAction {
+                        swap.animate()
+                            .rotationBy(180f)
+                            .setDuration(0)
+                            .withEndAction {
+                                swap.animate()
+                                    .rotationBy(90f)
+                                    .setInterpolator(OvershootInterpolator(2f))
+                                    .setDuration(duration/2)
+                                    .withEndAction {
+                                        swapAnimationRunning = false
+                                    }
+                                    .start()
+                            }
+                            .start()
+                    }
                     .start()
                 swapAnimationRunning = true
             }

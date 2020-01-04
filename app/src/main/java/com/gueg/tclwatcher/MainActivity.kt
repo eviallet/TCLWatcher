@@ -10,8 +10,6 @@ import android.preference.PreferenceManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import android.transition.AutoTransition
-import android.transition.Explode
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
@@ -22,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.transition.AutoTransition
+import androidx.transition.Explode
 import com.aditya.filebrowser.Constants
 import com.aditya.filebrowser.FileChooser
 import com.aditya.filebrowser.FolderChooser
@@ -217,9 +217,9 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private fun setFragment(fragment: Fragment) {
         if((currentFragment is RoutesFragment || currentFragment is HomepageFragment) && (fragment is RoutesFragment || fragment is HomepageFragment)) {
             if(!(fragment is RoutesFragment && currentFragment is RoutesFragment)) {
-                fragment.enterTransition = Explode(this, null)
+                fragment.enterTransition = Explode()
                 fragment.sharedElementEnterTransition = AutoTransition()
-                currentFragment!!.exitTransition = Explode(this, null)
+                currentFragment!!.exitTransition = Explode()
             }
 
             if(fragment is HomepageFragment)
@@ -227,9 +227,11 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             else if(fragment is RoutesFragment)
                 fragment.tempStationPickerData = currentFragment!!.view!!.findViewWithTag("transition_picker")
 
-            supportFragmentManager.beginTransaction()
+            supportFragmentManager
+                .beginTransaction()
                 .addSharedElement(currentFragment!!.view!!.findViewWithTag("transition_picker"), "transition_picker")
-                .replace(container.id, fragment).commit()
+                .replace(container.id, fragment)
+                .commit()
         } else
             supportFragmentManager.beginTransaction().replace(container.id, fragment).commit()
 
