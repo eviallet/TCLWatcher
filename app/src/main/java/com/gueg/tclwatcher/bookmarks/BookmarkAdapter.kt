@@ -25,6 +25,7 @@ class BookmarkAdapter internal constructor(
 ) : RecyclerView.Adapter<BookmarkAdapter.ViewHolder>() {
 
     private val bookmarks = ArrayList<Bookmark>()
+    private var firstRecyclerViewAdd = true
 
     companion object {
         const val HORIZONTAL_MARGIN = 10
@@ -245,21 +246,27 @@ class BookmarkAdapter internal constructor(
                         viewAt(i)!!.isFirstExpanding = true
                 }
             }
-            notifyDataSetChanged()
+            notifyItemRangeChanged(0, bookmarks.size)
         }
     }
 
     private fun setRecyclerViews(holder: ViewHolder, bookmark: Bookmark) {
-        holder.recyclerView1.setHasFixedSize(true)
-        holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
-        holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-        holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+        if(firstRecyclerViewAdd) {
+            holder.recyclerView1.setHasFixedSize(true)
+            holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
+            holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+        }
         holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextDatetime: String ->
             activity.runOnUiThread {
-                holder.recyclerView2.setHasFixedSize(true)
-                holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
-                holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-                holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+                if(firstRecyclerViewAdd) {
+                    holder.recyclerView2.setHasFixedSize(true)
+                    holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
+                    holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                    holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
+
+                    firstRecyclerViewAdd = false
+                }
                 holder.recyclerView2.adapter = BookmarkRouteAdapter(activity, bookmark, next = nextDatetime, onTimesGot = { depart, arrival ->
                     activity.runOnUiThread {
                         holder.depart2.text = depart

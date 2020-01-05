@@ -56,9 +56,8 @@ class BookmarkRouteAdapter internal constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val subroute = subroutes[position]
 
-        if(subroute is Route.TCL) {
+        if(subroute is Route.TCL)
             ImageLoader.load(activity, subroute.pic, holder.pic)
-        }
     }
 
     override fun getItemCount() = subroutes.size
