@@ -29,7 +29,6 @@ class HomepageFragment : Fragment() {
     private lateinit var bookmarkAdapter: BookmarkAdapter
 
     private lateinit var refresh: ImageButton
-    private var isRefreshAnimated = false
 
     private lateinit var stationPickerListener: StationPicker.StationPickerListener
     private lateinit var stations: List<Station>

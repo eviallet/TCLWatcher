@@ -102,8 +102,8 @@
                     android:layout_height="match_parent"
 
                     android:layout_weight="1"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
                 <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -140,8 +140,8 @@
                     android:layout_height="match_parent"
 
                     android:layout_weight="1"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
                 <Spinner
                         android:id="@+id/view_stationpicker_param_date_spinner"
                         android:layout_width="match_parent"
@@ -176,8 +176,8 @@
                     android:layout_height="match_parent"
 
                     android:layout_weight="1"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
                 <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -218,41 +218,23 @@
             </RelativeLayout>
 
         </LinearLayout>
-        <RelativeLayout
-                android:layout_width="wrap_content"
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/view_stationpicker_fab"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:layout_below="@id/view_stationpicker_param_layout">
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/view_stationpicker_fab"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                android:text="Rechercher"
+                android:background="@drawable/bkg_square_rounded_button"
+                app:backgroundTint="@android:color/white"
+                app:icon="@drawable/ic_search"
+                app:iconGravity="textStart"
+                android:textAlignment="center"
+                app:elevation="5dp"
 
-                    android:text="Rechercher"
-                    android:background="@drawable/bkg_square_rounded_button"
-                    app:backgroundTint="@android:color/white"
-                    app:icon="@drawable/ic_search"
-                    app:iconGravity="textStart"
-                    android:textAlignment="center"
-                    app:elevation="5dp"
-
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"/>
-            <com.github.ybq.android.spinkit.SpinKitView
-                    android:id="@+id/view_stationpicker_loading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    app:SpinKit_Style="ThreeBounce"
-                    app:SpinKit_Color="@color/colorAccent"
-
-                    android:layout_alignParentStart="true"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="20dp" />
-        </RelativeLayout>
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_below="@id/view_stationpicker_param_layout"/>
     </RelativeLayout>
 </LinearLayout>

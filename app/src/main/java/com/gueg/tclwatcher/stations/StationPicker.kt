@@ -14,7 +14,6 @@ import android.view.animation.AnticipateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.*
-import com.github.ybq.android.spinkit.SpinKitView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.gueg.tclwatcher.R
 import com.gueg.tclwatcher.bookmarks.Bookmark
@@ -27,7 +26,6 @@ import kotlin.collections.ArrayList
 class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout(context, attrs) {
 
     private var titleText: TextView
-    private var loading: SpinKitView
     private var from: AutoCompleteTextView
     private var to: AutoCompleteTextView
     private var fab: ExtendedFloatingActionButton
@@ -59,8 +57,6 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
         to = findViewById(R.id.view_stationpicker_to)
 
         titleText = findViewById(R.id.view_stationpicker_text_search)
-
-        loading = findViewById(R.id.view_stationpicker_loading)
 
         bookmark = findViewById(R.id.view_stationpicker_bookmark)
         bookmark.setOnClickListener { listener!!.onBookmarkAdded(from.text.toString(), to.text.toString()) }
@@ -293,10 +289,13 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     }
 
     fun showTitle(show: Boolean) {
-        if(show)
+        if(show) {
             titleText.visibility = View.VISIBLE
-        else
+            bookmark.visibility = View.VISIBLE
+        } else {
             titleText.visibility = View.GONE
+            bookmark.visibility = View.GONE
+        }
     }
 
     fun initFrom(picker: StationPicker) {
@@ -317,10 +316,8 @@ class StationPicker(context: Context, attrs: AttributeSet ?= null) : FrameLayout
     fun setLoading(loading: Boolean) {
         if(loading) {
             // TODO morph search icon into loading animation
-            this.loading.visibility = View.VISIBLE
             fab.text = "Chargement..."
         } else {
-            this.loading.visibility = View.GONE
             fab.text = "Rechercher"
         }
     }

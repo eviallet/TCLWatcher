@@ -11,7 +11,8 @@
             android:layout_height="wrap_content"
 
             android:tag="transition_picker"
-            android:transitionName="transition_picker"/>
+            android:transitionName="transition_picker"
+            />
 
     <androidx.viewpager.widget.ViewPager
             android:id="@+id/fragment_routes_viewpager"

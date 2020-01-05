@@ -20,8 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.transition.AutoTransition
-import androidx.transition.Explode
+import androidx.transition.Fade
 import com.aditya.filebrowser.Constants
 import com.aditya.filebrowser.FileChooser
 import com.aditya.filebrowser.FolderChooser
@@ -115,7 +114,7 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
             val routesFragment = RoutesFragment()
             routesFragment.route = route
             routesFragment.routeFragmentListener = routeFragmentListener
-            setFragment(routesFragment)
+            this@MainActivity.runOnUiThread { setFragment(routesFragment) }
         }
     }
 
@@ -217,9 +216,8 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
     private fun setFragment(fragment: Fragment) {
         if((currentFragment is RoutesFragment || currentFragment is HomepageFragment) && (fragment is RoutesFragment || fragment is HomepageFragment)) {
             if(!(fragment is RoutesFragment && currentFragment is RoutesFragment)) {
-                fragment.enterTransition = Explode()
-                fragment.sharedElementEnterTransition = AutoTransition()
-                currentFragment!!.exitTransition = Explode()
+                fragment.enterTransition = Fade()
+                currentFragment!!.exitTransition = Fade()
             }
 
             if(fragment is HomepageFragment)
@@ -229,7 +227,6 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
 
             supportFragmentManager
                 .beginTransaction()
-                .addSharedElement(currentFragment!!.view!!.findViewWithTag("transition_picker"), "transition_picker")
                 .replace(container.id, fragment)
                 .commit()
         } else
@@ -474,7 +471,6 @@ class MainActivity : AppCompatActivity(), StationPicker.StationPickerListener {
         if (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastUpdate) >= 7) {
             prefs.edit().putLong("SEEK_FOR_UPDATES", System.currentTimeMillis()).apply()
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Pensez à vérifier les mises à jour de l'application.", Toast.LENGTH_SHORT).show()
                 return
             }
             beginUpdate(userAsked=false)
