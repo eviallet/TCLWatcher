@@ -240,10 +240,7 @@ class BookmarkAdapter internal constructor(
         } else {
             for(i in 0..bookmarks.lastIndex) {
                 if(viewAt(i)!=null) {
-                    if(viewAt(i)!!.isExpanded)
-                        setRecyclerViews(viewAt(i)!!, bookmarks[i])
-                    else
-                        viewAt(i)!!.isFirstExpanding = true
+                    setRecyclerViews(viewAt(i)!!, bookmarks[i])
                 }
             }
             notifyItemRangeChanged(0, bookmarks.size)
@@ -251,18 +248,18 @@ class BookmarkAdapter internal constructor(
     }
 
     private fun setRecyclerViews(holder: ViewHolder, bookmark: Bookmark) {
+        holder.recyclerView1.setHasFixedSize(true)
+        holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
+        holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         if(firstRecyclerViewAdd) {
-            holder.recyclerView1.setHasFixedSize(true)
-            holder.recyclerView1.overScrollMode = OVER_SCROLL_NEVER
-            holder.recyclerView1.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             holder.recyclerView1.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
         }
         holder.recyclerView1.adapter = BookmarkRouteAdapter(activity, bookmark, onFinished = { nextDatetime: String ->
             activity.runOnUiThread {
+                holder.recyclerView2.setHasFixedSize(true)
+                holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
+                holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                 if(firstRecyclerViewAdd) {
-                    holder.recyclerView2.setHasFixedSize(true)
-                    holder.recyclerView2.overScrollMode = OVER_SCROLL_NEVER
-                    holder.recyclerView2.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
                     holder.recyclerView2.addItemDecoration(OrientedItemDecoration(HORIZONTAL_MARGIN, orientation = OrientedItemDecoration.HORIZONTAL))
 
                     firstRecyclerViewAdd = false

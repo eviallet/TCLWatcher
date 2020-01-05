@@ -44,9 +44,6 @@ class ImageLoader {
                                             bmp.setPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
                                             ImageCache.save(activity, name, bmp)
                                         }
-                                        else {
-                                            imageView.setSVG(url)
-                                        }
                                     }
                                 }.start()
                             }
