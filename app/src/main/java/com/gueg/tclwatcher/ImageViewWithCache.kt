@@ -31,12 +31,6 @@ class ImageViewWithCache(context: Context, attrs : AttributeSet?= null) : FrameL
         imageView.setImageBitmap(bmp)
     }
 
-    fun setDrawable(id: Int) {
-        setSelected(Selected.IMAGEVIEW)
-
-        imageView.setImageDrawable(context.getDrawable(id))
-    }
-
     fun setSVG(url: String) {
         setSelected(Selected.WEBVIEW)
 

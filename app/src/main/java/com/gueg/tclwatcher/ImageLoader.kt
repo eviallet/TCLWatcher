@@ -32,13 +32,21 @@ class ImageLoader {
                                         val pixels = IntArray(bmp.height*bmp.width)
                                         bmp.getPixels(pixels, /*offset*/ 0, /*stride*/ bmp.width, /*x*/ 0, /*y*/ 0, /*width*/ bmp.width, /*height*/ bmp.height)
                                         for(pixel in pixels) {
-                                            if(pixel != Color.WHITE) {
-                                                isWhiteOnly = true
-                                                break
-                                            }
+                                            if(pixel != Color.WHITE)
+                                                isWhiteOnly = false
                                         }
-                                        if(!isWhiteOnly)
+                                        if(!isWhiteOnly) {
+                                            // make white transparent
+                                            for(i in pixels.indices) {
+                                                if(pixels[i] == Color.WHITE)
+                                                    pixels[i] = Color.alpha(Color.TRANSPARENT)
+                                            }
+                                            bmp.setPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
                                             ImageCache.save(activity, name, bmp)
+                                        }
+                                        else {
+                                            imageView.setSVG(url)
+                                        }
                                     }
                                 }.start()
                             }
